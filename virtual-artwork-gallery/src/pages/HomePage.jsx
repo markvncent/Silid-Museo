@@ -1,16 +1,72 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollHero from '../components/landing/ScrollHero';
-import CategoryDoor from '../components/landing/CategoryDoor';
+import { FocusRail } from '../components/ui/focus-rail';
 import categories from '../data/categoryConfig';
+import { getCategories } from '../services/categories';
 import wordmarkImg from '../assets/Wordmark.png';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import ParallaxTeaserImages from '../components/landing/ParallaxTeaserImages';
+
+/**
+ * Map each category to a FocusRail item with a representative Unsplash image.
+ */
+const CATEGORY_IMAGES = {
+  'silid-lona': 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1000&auto=format&fit=crop',
+  'silid-tinig': 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1000&auto=format&fit=crop',
+  'silid-salin': 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=1000&auto=format&fit=crop',
+  'silid-kasaysayan': 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop',
+  'silid-espasyo': 'https://images.unsplash.com/photo-1605721911519-3dfeb3be25e7?q=80&w=1000&auto=format&fit=crop',
+  'silid-aninag': 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1000&auto=format&fit=crop',
+  'silid-manlilikha': 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000&auto=format&fit=crop',
+};
 
 const HERO_FRAME_COUNT = 142;
 
 export default function HomePage() {
   const [activePhase, setActivePhase] = useState(0);
+  const [railItems, setRailItems] = useState([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      let finalCategories = categories;
+
+      try {
+        const dbCats = await getCategories();
+        if (dbCats && dbCats.length > 0) {
+          // Merge database category metadata with local config styles (icons, gradients)
+          finalCategories = dbCats.map((dbCat) => {
+            // Match based on medium_type (which maps to our slugs)
+            const localConfig = categories.find((c) => c.slug === dbCat.medium_type) || {};
+            return {
+              id: dbCat.id,
+              slug: dbCat.medium_type,
+              name: dbCat.name,
+              description: dbCat.description,
+              icon: localConfig.icon || '🎨',
+              gradient: localConfig.gradient || 'from-neutral-800 to-neutral-900',
+              cover_image_url: dbCat.cover_image_url || localConfig.cover_image_url,
+            };
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to load categories from Supabase, using local static config fallback:', err.message);
+      } finally {
+        // Map categories to FocusRail items format
+        const items = finalCategories.map((cat) => ({
+          id: cat.id || cat.slug,
+          title: cat.name,
+          description: cat.description,
+          meta: `${cat.icon} Category`,
+          imageSrc: cat.cover_image_url || CATEGORY_IMAGES[cat.slug] || CATEGORY_IMAGES['silid-lona'],
+          href: `/category/${cat.slug}`,
+        }));
+        setRailItems(items);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   // Stable reference so ScrollHero doesn't re-preload on every render
   const getFramePath = useCallback(
@@ -47,24 +103,24 @@ export default function HomePage() {
         <div className="relative z-20 flex h-full items-center justify-center px-8 md:px-16 lg:px-24 pt-28 pb-8">
           <div className="w-full max-w-[1200px] text-center transition-all duration-300 flex flex-col items-center">
             {/* Main Heading */}
-            <div className="mb-6 animate-slide-up flex items-center justify-center w-full overflow-hidden h-24 sm:h-36 md:h-48 lg:h-60 xl:h-72">
+            <div className="mb-6 animate-slide-up flex items-center justify-center w-full min-h-[80px] sm:min-h-[120px] md:min-h-[180px] lg:min-h-[240px] py-4 relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activePhase}
-                  initial={{ y: 30, opacity: 0 }}
+                  initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -30, opacity: 0 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex items-center justify-center w-full h-full px-4"
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex items-center justify-center w-full px-4"
                 >
                   {activePhase === 0 ? (
                     <img
                       src={wordmarkImg}
                       alt="Virtual Artwork Gallery"
-                      className="h-full w-auto max-w-[300px] sm:max-w-[700px] md:max-w-[900px] lg:max-w-[1100px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+                      className="h-16 sm:h-24 md:h-36 lg:h-48 xl:h-56 w-auto max-w-[280px] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
                     />
                   ) : (
-                    <span className="text-5xl font-bold leading-none tracking-wide text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)] sm:text-7xl md:text-8xl lg:text-9xl font-heading">
+                    <span className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold leading-tight sm:leading-none tracking-wide text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)] font-heading">
                       {activePhase === 1 ? "Art in Every Form." : "Inspiration in Every Piece."}
                     </span>
                   )}
@@ -144,12 +200,19 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Category Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((cat, i) => (
-              <CategoryDoor key={cat.slug} {...cat} index={i} />
-            ))}
-          </div>
+          {/* Category Focus Rail */}
+          {railItems.length > 0 ? (
+            <FocusRail
+              items={railItems}
+              autoPlay={false}
+              loop={true}
+              className="rounded-2xl"
+            />
+          ) : (
+            <div className="h-[600px] w-full flex items-center justify-center bg-neutral-950 rounded-2xl border border-white/5 animate-pulse">
+              <span className="text-neutral-500 text-sm">Opening the gallery doors...</span>
+            </div>
+          )}
         </div>
       </section>
 
@@ -157,7 +220,9 @@ export default function HomePage() {
       <section className="relative overflow-hidden py-24">
         <div
           className="absolute inset-0 transition-colors duration-300"
-          style={{ backgroundColor: 'var(--bg-surface)' }}
+          style={{ 
+            background: 'linear-gradient(to bottom, var(--bg-primary), var(--bg-surface) 20%, var(--bg-surface) 100%)' 
+          }}
         />
 
         <div className="relative z-10 mx-auto max-w-7xl px-6">
