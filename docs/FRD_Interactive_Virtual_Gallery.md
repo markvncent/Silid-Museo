@@ -14,7 +14,7 @@ This document defines the functional requirements for the **Interactive Virtual 
 
 ### 1.2 Scope
 The system is a single web application composed of:
-- A **public-facing gallery** with a landing page, 8 category "doors," expandable artwork views, and feedback/rating mechanisms.
+- A **public-facing gallery** with a landing page, 7 category "doors," expandable artwork views, and feedback/rating mechanisms.
 - A **lightweight admin interface** (code/password-gated, no user accounts) for managing categories and artworks.
 
 The system does **not** include multi-user account registration, e-commerce/checkout functionality, or social sharing integrations unless later added as an extension.
@@ -25,7 +25,7 @@ Instructor/evaluator, project adviser, and the developer (for implementation ref
 ### 1.4 Definitions
 | Term | Definition |
 |---|---|
-| Category | One of the 8 sections representing an art medium (e.g., Photography, Music, Film/Video) |
+| Category | One of the 7 sections representing an art medium (e.g., Photography, Music, Film/Video) |
 | Artwork/Art Piece | An individual uploaded item (image, audio, video, etc.) within a category |
 | Admin Mode | A restricted state of the site unlocked via a code/password, allowing content edits |
 | Visitor | Any unauthenticated user browsing the public gallery |
@@ -34,7 +34,7 @@ Instructor/evaluator, project adviser, and the developer (for implementation ref
 
 ## 2. System Overview
 
-The website behaves like a **digital gallery/portfolio**. The landing page introduces the gallery and presents 8 categories, visually represented as doors or shelves. Selecting a category "opens" into a dedicated page listing the artworks under that medium. Each artwork can be expanded for a closer view and rated individually. Each category page also collects general feedback about that category as a whole. An admin, using a simple code, can add/edit/delete categories and artworks directly from the interface.
+The website behaves like a **digital gallery/portfolio**. The landing page introduces the gallery and presents 7 categories, visually represented as doors or shelves. Selecting a category "opens" into a dedicated page listing the artworks under that medium. Each artwork can be expanded for a closer view and rated individually. Each category page also collects general feedback about that category as a whole. An admin, using a simple code, can add/edit/delete categories and artworks directly from the interface.
 
 ---
 
@@ -60,14 +60,14 @@ Requirements are grouped by module. Each has an ID, description, and priority (*
 | FR-1.1 | The system shall display a landing/home page featuring the gallery's title, introduction/artist statement, and a call-to-action to explore categories. | M |
 | FR-1.2 | The system shall display a persistent navigation bar with links to Home, Categories/Gallery, About, and Contact (or equivalent portfolio sections). | M |
 | FR-1.3 | The system shall display a footer containing contact details, social/portfolio links, and copyright information. | M |
-| FR-1.4 | The landing page shall visually present the 8 categories as interactive elements (doors/shelves) that respond to hover/click with a transition effect (e.g., opening animation). | S |
+| FR-1.4 | The landing page shall visually present the 7 categories as interactive elements (doors/shelves) that respond to hover/click with a transition effect (e.g., opening animation). | S |
 | FR-1.5 | The navigation shall remain accessible/responsive across desktop and mobile viewports. | M |
 
 ### 4.2 Category (Art Medium) Pages
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-2.1 | The system shall support exactly 8 predefined categories, each representing a distinct art medium (e.g., Photography, Digital Art, Music/Audio, Film/Video, Writing/Poetry, Sculpture/3D, Traditional/Painting, Mixed Media). | M |
+| FR-2.1 | The system shall support exactly 7 predefined categories, each representing a distinct art medium (e.g., Photography, Digital Art, Music/Audio, Film/Video, Writing/Poetry, Sculpture/3D, Traditional/Painting, Mixed Media). | M |
 | FR-2.2 | Selecting a category from the landing page shall navigate the visitor to a dedicated category page displaying all artworks under that medium. | M |
 | FR-2.3 | Each category page shall display the category name, short description, and a grid/list of uploaded artworks. | M |
 | FR-2.4 | Each category page shall support multiple media types appropriate to that category (image files, audio files, video files, text/PDF, etc.). | M |
@@ -165,7 +165,7 @@ Requirements are grouped by module. Each has an ID, description, and priority (*
 
 ## 8. Assumptions and Constraints
 
-- The 8 categories are fixed in structure (the admin can edit their content/labels but the system is designed around 8 slots, per the project requirement).
+- The 7 categories are fixed in structure (the admin can edit their content/labels but the system is designed around 8 slots, per the project requirement).
 - No third-party authentication (Google/Facebook login, etc.) is required — access control for admin is a single shared code.
 - Ratings and feedback are anonymous; no user profiles are created or stored.
 - File storage approach (local server storage vs. cloud storage/CDN) is an implementation decision outside the scope of this FRD.
