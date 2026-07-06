@@ -136,7 +136,7 @@ export default function HomePage() {
                   {activePhase === 0 ? (
                     <img
                       src={wordmarkImg}
-                      alt="Virtual Artwork Gallery"
+                      alt="Silid-Museo"
                       className="h-16 sm:h-24 md:h-36 lg:h-48 xl:h-56 w-auto max-w-[280px] sm:max-w-[600px] md:max-w-[800px] lg:max-w-[1000px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
                     />
                   ) : (
