@@ -47,3 +47,38 @@ export async function getAverageRating(artworkId) {
     // No ratings yet — return sensible defaults instead of null
     return data ?? { average_rating: 0, rating_count: 0 };
 }
+
+/**
+ * Fetches ALL ratings across all artworks (for admin moderation).
+ * Joins with the artworks table to include the artwork title.
+ */
+export async function getAllRatings() {
+    const { data, error } = await supabase
+        .from('ratings')
+        .select('*, artworks(title, category_id)')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Failed to fetch all ratings:', error.message);
+        throw error;
+    }
+
+    return data;
+}
+
+/**
+ * Deletes a single rating entry (admin moderation).
+ */
+export async function deleteRating(ratingId) {
+    const { error } = await supabase
+        .from('ratings')
+        .delete()
+        .eq('id', ratingId);
+
+    if (error) {
+        console.error('Failed to delete rating:', error.message);
+        throw error;
+    }
+
+    return true;
+}

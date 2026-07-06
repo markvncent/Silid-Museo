@@ -79,3 +79,73 @@ export async function getCategoryFeedback(categoryId) {
 
     return data;
 }
+
+/**
+ * Fetches ALL artwork feedback across all artworks (for admin moderation).
+ * Joins with the artworks table to include the artwork title.
+ */
+export async function getAllArtworkFeedback() {
+    const { data, error } = await supabase
+        .from('artwork_feedback')
+        .select('*, artworks(title, category_id)')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Failed to fetch all artwork feedback:', error.message);
+        throw error;
+    }
+
+    return data;
+}
+
+/**
+ * Fetches ALL category feedback across all categories (for admin moderation).
+ * Joins with the categories table to include the category name.
+ */
+export async function getAllCategoryFeedback() {
+    const { data, error } = await supabase
+        .from('category_feedback')
+        .select('*, categories(name)')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Failed to fetch all category feedback:', error.message);
+        throw error;
+    }
+
+    return data;
+}
+
+/**
+ * Deletes a single artwork feedback comment (admin moderation).
+ */
+export async function deleteArtworkFeedback(feedbackId) {
+    const { error } = await supabase
+        .from('artwork_feedback')
+        .delete()
+        .eq('id', feedbackId);
+
+    if (error) {
+        console.error('Failed to delete artwork feedback:', error.message);
+        throw error;
+    }
+
+    return true;
+}
+
+/**
+ * Deletes a single category feedback comment (admin moderation).
+ */
+export async function deleteCategoryFeedback(feedbackId) {
+    const { error } = await supabase
+        .from('category_feedback')
+        .delete()
+        .eq('id', feedbackId);
+
+    if (error) {
+        console.error('Failed to delete category feedback:', error.message);
+        throw error;
+    }
+
+    return true;
+}
