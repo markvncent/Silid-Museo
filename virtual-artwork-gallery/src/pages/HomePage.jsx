@@ -229,8 +229,31 @@ export default function HomePage() {
               className="rounded-2xl"
             />
           ) : (
-            <div className="h-[600px] w-full flex items-center justify-center bg-neutral-950 rounded-2xl border border-white/5 animate-pulse">
-              <span className="text-neutral-500 text-sm">Opening the gallery doors...</span>
+            <div className="flex gap-6 overflow-hidden h-[600px] w-full justify-center items-center px-4">
+              {/* Left Card Skeleton */}
+              <div className="hidden lg:block w-[280px] h-[420px] opacity-30 bg-neutral-900/60 rounded-2xl animate-pulse border border-white/5" />
+              
+              {/* Center Card Skeleton */}
+              <div className="w-[340px] sm:w-[380px] h-[520px] bg-neutral-950/70 rounded-2xl animate-pulse border border-amber-500/10 relative overflow-hidden flex flex-col justify-end p-6 shadow-2xl">
+                {/* Background ambient glow inside the card */}
+                <div className="absolute inset-0 bg-gradient-to-t from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+                
+                {/* Glassmorphic info block placeholder */}
+                <div className="space-y-3 relative z-10 w-full p-5 rounded-xl border border-white/5 bg-black/45 backdrop-blur-md">
+                  {/* Category main name skeleton */}
+                  <div className="h-7 w-1/2 bg-neutral-800/80 rounded animate-pulse" />
+                  {/* Room subheading skeleton */}
+                  <div className="h-4 w-1/3 bg-neutral-800/50 rounded animate-pulse" />
+                  {/* Description line skeleton */}
+                  <div className="space-y-1.5 pt-2">
+                    <div className="h-3 w-full bg-neutral-800/50 rounded animate-pulse" />
+                    <div className="h-3 w-5/6 bg-neutral-800/50 rounded animate-pulse" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Card Skeleton */}
+              <div className="hidden lg:block w-[280px] h-[420px] opacity-30 bg-neutral-900/60 rounded-2xl animate-pulse border border-white/5" />
             </div>
           )}
         </div>

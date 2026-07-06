@@ -162,27 +162,32 @@ export default function ScrollHero({
     >
       {/* Sticky wrapper — pinned to viewport while user scrolls */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Loading state */}
+        {/* Loading state - Glassmorphic Skeleton */}
         {!loaded && (
-          <div
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center"
-            style={{ backgroundColor: 'var(--bg-primary)' }}
-          >
-            <div className="mb-4 text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-              Loading gallery...
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
+            {/* Pulsing Logo Skeleton */}
+            <div className="w-64 h-24 sm:w-96 sm:h-36 bg-neutral-900/40 rounded-2xl border border-white/5 animate-pulse flex items-center justify-center shadow-2xl">
+              <span className="text-amber-500/20 text-4xl sm:text-5xl font-heading tracking-widest animate-pulse font-bold">SM</span>
             </div>
-            {/* Progress bar */}
-            <div className="h-1 w-48 overflow-hidden rounded-full" style={{ backgroundColor: 'var(--bg-surface)' }}>
-              <div
-                className="h-full rounded-full transition-all duration-200"
-                style={{
-                  width: `${progress * 100}%`,
-                  backgroundColor: 'var(--accent-gold)',
-                }}
-              />
-            </div>
-            <div className="mt-2 text-xs" style={{ color: 'var(--text-secondary)' }}>
-              {Math.round(progress * 100)}%
+            
+            {/* Pulsing Text & Progress */}
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400 animate-pulse">
+                Entering Silid-Museo
+              </span>
+              {/* Progress bar */}
+              <div className="h-1.5 w-48 overflow-hidden rounded-full bg-neutral-950 border border-white/5 mt-2">
+                <div
+                  className="h-full rounded-full transition-all duration-200"
+                  style={{
+                    width: `${progress * 100}%`,
+                    backgroundColor: 'var(--accent-gold)',
+                  }}
+                />
+              </div>
+              <span className="text-xs text-neutral-500 font-medium">
+                {Math.round(progress * 100)}%
+              </span>
             </div>
           </div>
         )}
