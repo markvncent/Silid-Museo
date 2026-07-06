@@ -167,9 +167,9 @@ export default function ScrollHero({
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md">
             {/* Pulsing Logo Skeleton */}
             <div className="w-64 h-24 sm:w-96 sm:h-36 bg-neutral-900/40 rounded-2xl border border-white/5 animate-pulse flex items-center justify-center shadow-2xl">
-              <span className="text-amber-500/20 text-4xl sm:text-5xl font-heading tracking-widest animate-pulse font-bold">SM</span>
+              <span className="text-amber-500/20 text-5xl sm:text-7xl font-kingston tracking-widest animate-pulse font-normal">M</span>
             </div>
-            
+
             {/* Pulsing Text & Progress */}
             <div className="mt-8 flex flex-col items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400 animate-pulse">
