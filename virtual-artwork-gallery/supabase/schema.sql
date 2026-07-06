@@ -17,6 +17,7 @@ create table categories (
   cover_image_url text,
   medium_type text not null,           -- e.g. 'photography', 'music', 'video'
   display_order smallint not null,     -- controls order on landing page (1–8)
+  expanded_description text,           -- detailed room description for CategoryPage
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
 

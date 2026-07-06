@@ -1,11 +1,27 @@
+import Particles from '@/components/ui/Particles';
+
 export default function AboutPage() {
   return (
-    <div>
+    <div className="relative z-0">
+      {/* Particles background covering the entirety of the About page */}
+      <Particles
+        particleColors={["#ffdb6a"]}
+        particleCount={200}
+        particleSpread={10}
+        speed={0.2}
+        particleBaseSize={100}
+        moveParticlesOnHover
+        alphaParticles={false}
+        disableRotation={false}
+        pixelRatio={1}
+        className="fixed inset-0 w-screen h-screen pointer-events-none z-[-1] opacity-[0.08] dark:opacity-[0.2]"
+      />
+
       {/* Header */}
       <section className="relative overflow-hidden py-20">
-        <div className="absolute inset-0" style={{ backgroundColor: 'var(--bg-surface)' }} />
+        <div className="absolute inset-0 z-[-2]" style={{ backgroundColor: 'var(--bg-surface)' }} />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 z-[-2]"
           style={{
             background: 'linear-gradient(to bottom, var(--bg-overlay), var(--bg-primary))',
           }}

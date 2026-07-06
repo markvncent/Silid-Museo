@@ -2,6 +2,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollHero from '../components/landing/ScrollHero';
 import { FocusRail } from '../components/ui/focus-rail';
+import AnimatedRays from '@/components/ui/animated-rays';
+import Particles from '@/components/ui/Particles';
 import categories from '../data/categoryConfig';
 import { getCategories } from '../services/categories';
 import wordmarkImg from '../assets/Wordmark.png';
@@ -91,7 +93,10 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div>
+    <div className="relative">
+      {/* Fixed background light rays covering the entire homepage viewport */}
+      <AnimatedRays className="fixed inset-0 w-screen h-screen rounded-none border-none opacity-[0.06] dark:opacity-[0.18] pointer-events-none z-40" />
+
       {/* SCROLL-SCRUBBED HERO */}
       <ScrollHero
         frameCount={HERO_FRAME_COUNT}
@@ -99,6 +104,21 @@ export default function HomePage() {
         scrollHeight={5}
         onProgress={handleProgress}
       >
+        {/* Interactive particles overlay in the header banner */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-10 opacity-70">
+          <Particles
+            particleColors={["#ffdb6a"]}
+            particleCount={150}
+            particleSpread={12}
+            speed={0.15}
+            particleBaseSize={80}
+            moveParticlesOnHover
+            alphaParticles={false}
+            disableRotation={false}
+            pixelRatio={1}
+          />
+        </div>
+
         {/* Hero content overlay */}
         <div className="relative z-20 flex h-full items-center justify-center px-8 md:px-16 lg:px-24 pt-28 pb-8">
           <div className="w-full max-w-[1200px] text-center transition-all duration-300 flex flex-col items-center">
@@ -224,6 +244,21 @@ export default function HomePage() {
             background: 'linear-gradient(to bottom, var(--bg-primary), var(--bg-surface) 20%, var(--bg-surface) 100%)' 
           }}
         />
+
+        {/* Particles Background Overlay */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+          <Particles
+            particleColors={["#ffdb6a"]}
+            particleCount={200}
+            particleSpread={10}
+            speed={0.2}
+            particleBaseSize={100}
+            moveParticlesOnHover
+            alphaParticles={false}
+            disableRotation={false}
+            pixelRatio={1}
+          />
+        </div>
 
         <div className="relative z-10 mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-12 md:grid-cols-2">

@@ -6,6 +6,20 @@ import { getArtworksByCategory } from '../services/artworks';
 import { getCategoryFeedback, submitCategoryFeedback } from '../services/feedback';
 import ArtworkCard from '../components/gallery/ArtworkCard';
 import ArtworkModal from '../components/gallery/ArtworkModal';
+import { cn } from '@/lib/utils';
+import { getCategoryById } from '../services/categories';
+
+function parseCategoryName(fullName) {
+  if (!fullName) return { main: "", sub: "" };
+  const match = fullName.match(/^(Silid-[^\s(]+)(?:\s*(\([^)]+\)))?/);
+  if (match) {
+    return {
+      main: match[1],
+      sub: match[2] || ""
+    };
+  }
+  return { main: fullName, sub: "" };
+}
 
 export default function CategoryPage() {
   const { slug } = useParams();
@@ -14,6 +28,7 @@ export default function CategoryPage() {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeArtwork, setActiveArtwork] = useState(null);
+  const [dbCategory, setDbCategory] = useState(null);
 
   // Category General Feedback States
   const [feedbackList, setFeedbackList] = useState([]);
@@ -22,7 +37,7 @@ export default function CategoryPage() {
 
   useEffect(() => {
     if (!category) return;
-    
+
     // Reset page states
     setArtworks([]);
     setFeedbackList([]);
@@ -35,6 +50,16 @@ export default function CategoryPage() {
       let fetchedFeedback = [];
 
       try {
+        // Try fetching category details from Supabase
+        try {
+          const fetchedCat = await getCategoryById(category.id);
+          if (fetchedCat) {
+            setDbCategory(fetchedCat);
+          }
+        } catch (e) {
+          console.warn('Failed to fetch category details from Supabase');
+        }
+
         // Try fetching artworks from Supabase
         try {
           fetchedArtworks = await getArtworksByCategory(category.id);
@@ -55,7 +80,7 @@ export default function CategoryPage() {
         if (!fetchedArtworks || fetchedArtworks.length === 0) {
           fetchedArtworks = fallbackArtworks[category.slug] || [];
         }
-        
+
         // Merge category feedback with localStorage category feedback
         const localFeedback = JSON.parse(localStorage.getItem(`cat_feedback_${category.slug}`) || '[]');
         const combinedFeedback = [...localFeedback, ...fetchedFeedback].sort(
@@ -148,30 +173,52 @@ export default function CategoryPage() {
   }
 
   return (
-    <div>
+    <div className="relative">
       {/* Category Header */}
-      <section className="relative overflow-hidden py-20">
-        <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-10`} />
+      <section className="sticky top-0 z-0 overflow-hidden w-full pt-32 pb-16 md:pt-44 md:pb-24">
+        {/* Background image overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-100"
+          style={{ backgroundImage: "url('/category-header-bg.png')" }}
+        />
+
+        {/* Gradient overlay to fade from top (navbar background) and to the page body at the bottom */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, var(--bg-overlay), var(--bg-primary))',
+            background: 'linear-gradient(to bottom, rgba(10, 7, 5, 0.6) 0%, transparent 25%, transparent 60%, var(--bg-primary) 100%)',
           }}
         />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 text-center">
-          <div className="mb-4 text-6xl">{category.icon}</div>
-          <h1 className="mb-4 text-4xl font-bold sm:text-5xl" style={{ color: 'var(--text-primary)' }}>
-            {category.name}
-          </h1>
-          <p className="mx-auto max-w-xl text-lg leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            {category.description}
+        <div className="relative z-10 mx-auto max-w-7xl px-6 text-left">
+          {(() => {
+            const { main, sub } = parseCategoryName(category.name);
+            return (
+              <div className="mb-6 flex flex-col items-start gap-2">
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal leading-none font-kingston tracking-wide text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+                  {main}
+                </h1>
+                {sub && (
+                  <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-heading font-semibold tracking-wider text-amber-500 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                    {sub}
+                  </span>
+                )}
+              </div>
+            );
+          })()}
+          <p className="max-w-3xl text-base md:text-lg leading-relaxed text-neutral-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] whitespace-pre-line">
+            {dbCategory?.expanded_description || category?.expanded_description || category?.description}
           </p>
         </div>
       </section>
 
-      {/* Artworks Display Section */}
-      <section className="py-16">
+      {/* Main Body Content - overlaps the sticky header on scroll */}
+      <div 
+        className="relative z-10 rounded-t-[32px] md:rounded-t-[48px] shadow-[0_-15px_40px_rgba(0,0,0,0.9)] overflow-hidden"
+        style={{ backgroundColor: 'var(--bg-primary)' }}
+      >
+        {/* Artworks Display Section */}
+        <section className="py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -327,6 +374,8 @@ export default function CategoryPage() {
           Back to all rooms
         </Link>
       </section>
+
+      </div>
 
       {/* Lightbox / Artwork Modal */}
       {activeArtwork && (

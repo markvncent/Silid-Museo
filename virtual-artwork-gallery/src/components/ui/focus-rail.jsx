@@ -6,6 +6,18 @@ import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
+function parseCategoryName(fullName) {
+  if (!fullName) return { main: "", sub: "" };
+  const match = fullName.match(/^(Silid-[^\s(]+)(?:\s*(\([^)]+\)))?/);
+  if (match) {
+    return {
+      main: match[1],
+      sub: match[2] || ""
+    };
+  }
+  return { main: fullName, sub: "" };
+}
+
 /**
  * Helper to wrap indices (e.g., -1 becomes length-1)
  */
@@ -137,6 +149,16 @@ export function FocusRail({
         className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none z-10"
         style={{ background: 'linear-gradient(to top, var(--bg-primary), transparent)' }}
       />
+      {/* Left Gradient Fade Overlay */}
+      <div
+        className="absolute top-0 bottom-0 left-0 w-24 md:w-48 pointer-events-none z-10"
+        style={{ background: 'linear-gradient(to right, var(--bg-primary), transparent)' }}
+      />
+      {/* Right Gradient Fade Overlay */}
+      <div
+        className="absolute top-0 bottom-0 right-0 w-24 md:w-48 pointer-events-none z-10"
+        style={{ background: 'linear-gradient(to left, var(--bg-primary), transparent)' }}
+      />
 
       {/* Background Ambience */}
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -252,9 +274,21 @@ export function FocusRail({
                       backgroundColor: 'rgba(0, 0, 0, 0.35)',
                     }}
                   >
-                    <h3 className="text-2xl font-bold leading-snug text-white drop-shadow-md">
-                      {item.title}
-                    </h3>
+                    {(() => {
+                      const { main, sub } = parseCategoryName(item.title);
+                      return (
+                        <div className="flex flex-col gap-0.5">
+                          <h3 className="text-3xl md:text-4xl font-normal leading-tight text-white drop-shadow-md font-kingston tracking-wide">
+                            {main}
+                          </h3>
+                          {sub && (
+                            <span className="text-xs md:text-sm font-heading font-medium tracking-wider text-amber-500/90 drop-shadow-sm">
+                              {sub}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                     {item.description && (
                       <p className="mt-1.5 text-xs leading-relaxed text-neutral-300/80 line-clamp-2">
                         {item.description}
