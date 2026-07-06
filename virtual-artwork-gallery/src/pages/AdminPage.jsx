@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabaseClient"; // Adjust the path if needed
+import { supabase } from "../lib/supabaseClient";
 
 export default function AdminPage() {
   const [code, setCode] = useState("");
@@ -21,26 +21,23 @@ export default function AdminPage() {
     setError("");
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "verify-admin",
-        {
-          body: {
-            code,
-          },
-        }
+      // Ask Postgres to re-hash the code and compare it to the
+      // stored hash — the actual comparison never happens in the browser.
+      const { data: isValid, error: rpcError } = await supabase.rpc(
+        "verify_admin_code",
+        { input_code: code }
       );
 
-      if (error) throw error;
-
-      if (data.success) {
-        // Save admin session
-        sessionStorage.setItem("isAdmin", "true");
-
-        // Redirect
-        navigate("/admin/dashboard");
-      } else {
+      if (rpcError || !isValid) {
         setError("Invalid access code.");
+        return;
       }
+
+      // Save admin session
+      sessionStorage.setItem("isAdmin", "true");
+
+      // Redirect to dashboard
+      navigate("/admin/dashboard");
     } catch (err) {
       console.error(err);
       setError("Unable to verify access code.");
