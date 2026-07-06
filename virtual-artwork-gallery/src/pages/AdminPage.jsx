@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { adminLogin } from "../services/adminApi.js";
 
 export default function AdminPage() {
   const [code, setCode] = useState("");
@@ -12,7 +12,9 @@ export default function AdminPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!code.trim()) {
+    const trimmedCode = code.trim();
+
+    if (!trimmedCode) {
       setError("Please enter the access code.");
       return;
     }
@@ -21,26 +23,22 @@ export default function AdminPage() {
     setError("");
 
     try {
-      // Ask Postgres to re-hash the code and compare it to the
-      // stored hash — the actual comparison never happens in the browser.
-      const { data: isValid, error: rpcError } = await supabase.rpc(
-        "verify_admin_code",
-        { input_code: code }
-      );
+      // 🔐 Calls Edge Function (validates ADMIN_ACCESS_CODE in backend)
+      await adminLogin(trimmedCode);
 
-      if (rpcError || !isValid) {
-        setError("Invalid access code.");
-        return;
-      }
-
-      // Save admin session
+      // optional UI state (keeps your existing logic)
       sessionStorage.setItem("isAdmin", "true");
 
-      // Redirect to dashboard
+      // redirect to dashboard
       navigate("/admin/dashboard");
     } catch (err) {
-      console.error(err);
-      setError("Unable to verify access code.");
+      console.error("Admin login error:", err);
+
+      setError(
+        err?.message === "Invalid access code"
+          ? "Invalid access code."
+          : err.message || "Unable to verify access code."
+      );
     } finally {
       setLoading(false);
     }
@@ -121,10 +119,10 @@ export default function AdminPage() {
               <div className="space-y-4">
                 <input
                   type="password"
-                  id="admin-code"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="off"
                   className="w-full rounded-xl border px-4 py-3.5 text-center text-sm tracking-[0.3em] outline-none transition-all duration-300"
                   style={{
                     backgroundColor: "var(--bg-primary)",
@@ -156,8 +154,7 @@ export default function AdminPage() {
               className="mt-6 text-center text-xs italic"
               style={{ color: "var(--text-muted)" }}
             >
-              Your access code is securely verified before admin access is
-              granted.
+              Your access code is securely verified before admin access is granted.
             </p>
           </div>
         </div>
