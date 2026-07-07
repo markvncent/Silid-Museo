@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "virtual-artwork-gallery/dist",
+  "outputDirectory": "silid-museo/dist",
   "cleanUrls": true,
   "routes": [
     { "handle": "filesystem" },

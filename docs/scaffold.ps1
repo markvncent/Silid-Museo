@@ -1,6 +1,6 @@
-# Adapted for current project structure: the Vite React app is inside 'virtual-artwork-gallery'
+# Adapted for current project structure: the Vite React app is inside 'silid-museo'
 
-$TargetDir = "virtual-artwork-gallery"
+$TargetDir = "silid-museo"
 
 if (-not (Test-Path $TargetDir)) {
     Write-Error "Error: Target directory '$TargetDir' not found."
