@@ -283,7 +283,107 @@ Deno.serve(async (req: Request) => {
       if (error) return json({ error: error.message }, 400);
       return json({ success: true });
     }
+// ── ARTWORK FEEDBACK: add / update / delete ──
+    if (path === "/artwork-feedback" && req.method === "POST") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("artwork_feedback")
+        .insert({ artwork_id: body.artworkId, comment_text: body.commentText })
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
 
+    if (path === "/artwork-feedback" && req.method === "PATCH") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("artwork_feedback")
+        .update(body.updates)
+        .eq("id", body.feedbackId)
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/artwork-feedback" && req.method === "DELETE") {
+      const { feedbackId } = await req.json();
+      const { error } = await supabaseAdmin
+        .from("artwork_feedback")
+        .delete()
+        .eq("id", feedbackId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
+
+    // ── CATEGORY FEEDBACK: add / update / delete ──
+    if (path === "/category-feedback" && req.method === "POST") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("category_feedback")
+        .insert({ category_id: body.categoryId, comment_text: body.commentText })
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/category-feedback" && req.method === "PATCH") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("category_feedback")
+        .update(body.updates)
+        .eq("id", body.feedbackId)
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/category-feedback" && req.method === "DELETE") {
+      const { feedbackId } = await req.json();
+      const { error } = await supabaseAdmin
+        .from("category_feedback")
+        .delete()
+        .eq("id", feedbackId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
+
+    // ── RATINGS: add / update / delete ──
+    if (path === "/ratings" && req.method === "POST") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("ratings")
+        .insert({ artwork_id: body.artworkId, score: body.score, voter_token: body.voterToken ?? null })
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/ratings" && req.method === "PATCH") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("ratings")
+        .update(body.updates)
+        .eq("id", body.ratingId)
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/ratings" && req.method === "DELETE") {
+      const { ratingId } = await req.json();
+      const { error } = await supabaseAdmin
+        .from("ratings")
+        .delete()
+        .eq("id", ratingId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
     return json(
       { error: "Not found" },
       404

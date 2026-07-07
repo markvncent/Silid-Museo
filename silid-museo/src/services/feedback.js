@@ -1,4 +1,7 @@
 import { supabase } from '../lib/supabase.js';
+import { adminFetch } from './adminApi.js';
+
+/* ─── Public: visitors reading/writing their own comments ─── */
 
 /**
  * Submits feedback tied to a specific artwork
@@ -80,9 +83,12 @@ export async function getCategoryFeedback(categoryId) {
     return data;
 }
 
+/* ─── Admin: moderation panel (reads + writes via Edge Function) ─── */
+
 /**
  * Fetches ALL artwork feedback across all artworks (for admin moderation).
  * Joins with the artworks table to include the artwork title.
+ * Read-only, so it stays on the direct client — no badge needed just to look.
  */
 export async function getAllArtworkFeedback() {
     const { data, error } = await supabase
@@ -117,35 +123,67 @@ export async function getAllCategoryFeedback() {
 }
 
 /**
+ * Creates an artwork comment from the admin panel (goes through the Edge Function).
+ */
+export async function createArtworkFeedbackAdmin(artworkId, commentText) {
+    return adminFetch('/artwork-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artworkId, commentText }),
+    });
+}
+
+/**
+ * Updates an artwork feedback comment (admin moderation).
+ */
+export async function updateArtworkFeedback(feedbackId, updates) {
+    return adminFetch('/artwork-feedback', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedbackId, updates }),
+    });
+}
+
+/**
  * Deletes a single artwork feedback comment (admin moderation).
  */
 export async function deleteArtworkFeedback(feedbackId) {
-    const { error } = await supabase
-        .from('artwork_feedback')
-        .delete()
-        .eq('id', feedbackId);
+    return adminFetch('/artwork-feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedbackId }),
+    });
+}
 
-    if (error) {
-        console.error('Failed to delete artwork feedback:', error.message);
-        throw error;
-    }
+/**
+ * Creates a category comment from the admin panel (goes through the Edge Function).
+ */
+export async function createCategoryFeedbackAdmin(categoryId, commentText) {
+    return adminFetch('/category-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId, commentText }),
+    });
+}
 
-    return true;
+/**
+ * Updates a category feedback comment (admin moderation).
+ */
+export async function updateCategoryFeedback(feedbackId, updates) {
+    return adminFetch('/category-feedback', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedbackId, updates }),
+    });
 }
 
 /**
  * Deletes a single category feedback comment (admin moderation).
  */
 export async function deleteCategoryFeedback(feedbackId) {
-    const { error } = await supabase
-        .from('category_feedback')
-        .delete()
-        .eq('id', feedbackId);
-
-    if (error) {
-        console.error('Failed to delete category feedback:', error.message);
-        throw error;
-    }
-
-    return true;
+    return adminFetch('/category-feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedbackId }),
+    });
 }

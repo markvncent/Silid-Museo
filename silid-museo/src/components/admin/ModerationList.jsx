@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getAllArtworkFeedback, getAllCategoryFeedback, deleteArtworkFeedback, deleteCategoryFeedback } from '../../services/feedback';
-import { getAllRatings, deleteRating } from '../../services/ratings';
-import categories from '../../data/categoryConfig';
+import { getAllArtworkFeedback, getAllCategoryFeedback, deleteArtworkFeedback, deleteCategoryFeedback } from '../../services/feedback.js';
+import { getAllRatings, deleteRating } from '../../services/ratings.js';
+import categories from '../../data/categoryConfig.js';
 
 const SUB_TABS = [
   { key: 'artwork_comments', label: 'Artwork Comments' },
