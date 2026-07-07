@@ -1,4 +1,5 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase.js';
+import { adminFetch } from './adminApi.js';
 
 /**
  * Fetches all 8 categories, ordered for landing page display.
@@ -39,23 +40,14 @@ export async function getCategoryById(categoryId) {
 /**
  * Updates a category's editable fields (name, description, cover image).
  *
- * NOTE: this will fail under current RLS policies when called with the
- * anon key — that's expected. This function exists now so it's ready
- * to be called from an Edge Function (service role key) in Phase 7,
- * rather than something we build from scratch later.
+ * Routed through the admin Edge Function — same front desk as
+ * artworks.js, just a different department down the hall. The
+ * service role key lives only inside the Edge Function, never here.
  */
-export async function updateCategory(categoryId, updates) {
-    const { data, error } = await supabase
-        .from('categories')
-        .update(updates)
-        .eq('id', categoryId)
-        .select()
-        .single();
-
-    if (error) {
-        console.error('Failed to update category:', error.message);
-        throw error;
-    }
-
-    return data;
+export function updateCategory(categoryId, updates) {
+    return adminFetch('/categories', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId, updates }),
+    });
 }

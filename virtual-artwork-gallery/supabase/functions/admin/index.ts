@@ -235,6 +235,21 @@ Deno.serve(async (req: Request) => {
       return json({ success: true });
     }
 
+    // ── CATEGORIES: update ──
+    // Same front desk, new department — the receptionist checks the
+    // same room key, then walks the request down this hallway instead.
+    if (path === "/categories" && req.method === "PATCH") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("categories")
+        .update(body.updates)
+        .eq("id", body.categoryId)
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
     // ── MEDIA: upload / delete ──
     if (path === "/media" && req.method === "POST") {
       const formData = await req.formData();
