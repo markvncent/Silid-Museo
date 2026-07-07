@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import Particles from '@/components/ui/Particles';
 import wordmarkImg from '../assets/Wordmark.png';
@@ -6,20 +6,41 @@ import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function AboutPage() {
   const scrollContainerRef = useRef(null);
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia('(min-width: 768px)');
-    const listener = () => setIsDesktop(media.matches);
-    listener(); // initial evaluation
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, []);
 
   return (
-    <div className="relative z-0 min-h-screen md:h-screen md:overflow-hidden flex flex-col justify-start">
-      {/* Dynamic Style block to control page-level scrolling and hide layout scrollbar on desktop */}
-      <style dangerouslySetInnerHTML={{ __html: `
+    <div className="relative z-0 flex-1 flex flex-col justify-start overflow-hidden min-h-0">
+      {/* Style block to control styling on About page */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        html, body {
+          overflow: hidden !important;
+          height: 100vh !important;
+          height: 100dvh !important;
+        }
+        
+        /* Lock standard layout wrapper scroll and force viewport height */
+        .flex.min-h-screen.flex-col {
+          height: 100vh !important;
+          height: 100dvh !important;
+          min-height: 100vh !important;
+          min-height: 100dvh !important;
+          overflow: hidden !important;
+        }
+
+        /* Make main tag fill remaining space and be a flex container */
+        main {
+          display: flex !important;
+          flex-direction: column !important;
+          overflow: hidden !important;
+          flex: 1 1 0% !important;
+          min-height: 0 !important;
+        }
+
+        /* Ensure footer does not shrink */
+        footer {
+          flex-shrink: 0 !important;
+        }
+
         /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar {
           display: none;
@@ -33,19 +54,6 @@ export default function AboutPage() {
         .justify-paragraphs .scroll-reveal-text {
           text-align: justify !important;
           text-justify: inter-word !important;
-        }
-
-        @media (min-width: 768px) {
-          html, body {
-            overflow: hidden !important;
-            height: 100vh !important;
-          }
-          /* Lock standard layout wrapper scroll */
-          .flex.min-h-screen.flex-col {
-            height: 100vh !important;
-            min-height: 100vh !important;
-            overflow: hidden !important;
-          }
         }
       `}} />
 
@@ -66,7 +74,7 @@ export default function AboutPage() {
 
       {/* Header (stays static above the scrollable area) */}
       <header className="relative pt-28 pb-8 flex flex-col items-center justify-center text-center select-none z-10 shrink-0">
-        <span 
+        <span
           className="uppercase tracking-[0.2em] font-sans font-semibold mb-2"
           style={{
             fontSize: '0.85rem',
@@ -76,41 +84,42 @@ export default function AboutPage() {
         >
           All About
         </span>
-        
-        <motion.div 
+
+        <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="relative z-10 px-6 animate-fade-in"
         >
-          <img 
-            src={wordmarkImg} 
-            alt="Silid Museo" 
-            className="h-18 sm:h-22 md:h-26 w-auto object-contain mx-auto filter dark:brightness-110 dark:invert-0 invert" 
+          <img
+            src={wordmarkImg}
+            alt="Silid Museo"
+            className="h-18 sm:h-22 md:h-26 w-auto object-contain mx-auto filter dark:brightness-110 dark:invert-0 invert"
           />
         </motion.div>
       </header>
 
-      {/* Content wrapper - behaves like inner scroll container on desktop */}
-      <div 
+      {/* Content wrapper */}
+      <div
         ref={scrollContainerRef}
-        className="flex-1 w-full px-6 md:px-8 no-scrollbar justify-paragraphs overflow-y-visible h-auto max-h-none md:overflow-y-scroll md:h-[55vh] shrink-0"
+        className="flex-1 w-full px-6 md:px-8 justify-paragraphs overflow-y-auto no-scrollbar min-h-0"
       >
         <div className="mx-auto max-w-[680px] w-full pb-24 space-y-10">
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
             blurStrength={4}
-            containerClassName="mx-auto text-justify"
-            textClassName="!text-sm md:!text-base leading-relaxed text-theme-primary font-heading font-normal text-justify"
+            containerClassName="mx-auto text-center"
+            textClassName="!text-sm md:!text-base font-heading font-semibold text-theme-primary text-center tracking-wide"
           >
-            {"Silid Museo is a conceptual digital sanctuary where art, history, space, and sound converge to create an interactive cultural experience. Conceived as a multi-room exhibition, Silid Museo—literally meaning \"Museum Room\"—reimagines how diverse artistic mediums can coexist, interact, and speak to the contemporary observer."}
+            {"Silid-Museo Curatorial Guild - The official Curatorial Body of BS BIO 3B [Group 1]"}
           </ScrollReveal>
 
+
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -122,7 +131,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -134,7 +143,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -146,7 +155,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -158,7 +167,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -170,7 +179,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -182,7 +191,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
@@ -194,7 +203,7 @@ export default function AboutPage() {
           </ScrollReveal>
 
           <ScrollReveal
-            scrollContainerRef={isDesktop ? scrollContainerRef : null}
+            scrollContainerRef={scrollContainerRef}
             enableBlur={true}
             baseOpacity={0.1}
             baseRotation={2}
