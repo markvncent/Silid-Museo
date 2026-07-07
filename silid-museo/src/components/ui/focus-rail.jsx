@@ -58,7 +58,6 @@ export function FocusRail({
 }) {
   const [active, setActive] = React.useState(initialIndex);
   const [isHovering, setIsHovering] = React.useState(false);
-  const lastWheelTime = React.useRef(0);
 
   const count = items.length;
   const activeIndex = wrap(0, count, active);
@@ -74,27 +73,6 @@ export function FocusRail({
     if (!loop && active === count - 1) return;
     setActive((p) => p + 1);
   }, [loop, active, count]);
-
-  // --- MOUSE WHEEL / TRACKPAD LOGIC ---
-  const onWheel = React.useCallback(
-    (e) => {
-      const now = Date.now();
-      if (now - lastWheelTime.current < 400) return;
-
-      const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      const delta = isHorizontal ? e.deltaX : e.deltaY;
-
-      if (Math.abs(delta) > 20) {
-        if (delta > 0) {
-          handleNext();
-        } else {
-          handlePrev();
-        }
-        lastWheelTime.current = now;
-      }
-    },
-    [handleNext, handlePrev]
-  );
 
   // Autoplay logic
   React.useEffect(() => {
@@ -137,7 +115,6 @@ export function FocusRail({
       onMouseLeave={() => setIsHovering(false)}
       tabIndex={0}
       onKeyDown={onKeyDown}
-      onWheel={onWheel}
     >
       {/* Top Gradient Fade Overlay */}
       <div
