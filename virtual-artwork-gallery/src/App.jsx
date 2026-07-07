@@ -1,13 +1,13 @@
 import { Routes, Route } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import ScrollToHash from './components/layout/ScrollToHash';
-import HomePage from './pages/HomePage';
-import CategoryPage from './pages/CategoryPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import AdminPage from './pages/AdminPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import AdminGate from './components/admin/AdminGate';
+import Layout from './components/layout/Layout.jsx';
+import ScrollToHash from './components/layout/ScrollToHash.jsx';
+import HomePage from './pages/HomePage.jsx';
+import CategoryPage from './pages/CategoryPage.jsx';
+import AboutPage from './pages/AboutPage.jsx';
+import ContactPage from './pages/ContactPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
+import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import AdminGate from './components/admin/AdminGate.jsx';
 
 function App() {
   return (
