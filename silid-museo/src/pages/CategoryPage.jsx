@@ -25,6 +25,7 @@ export default function CategoryPage() {
   const category = categories.find((c) => c.slug === slug);
 
   const [artworks, setArtworks] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [activeArtwork, setActiveArtwork] = useState(null);
   const [dbCategory, setDbCategory] = useState(null);
@@ -39,6 +40,7 @@ export default function CategoryPage() {
 
     // Reset page states
     setArtworks([]);
+    setSelectedSubcategory('All');
     setFeedbackList([]);
     setNewFeedback('');
     setActiveArtwork(null);
@@ -147,6 +149,13 @@ export default function CategoryPage() {
     }
   };
 
+  const filteredArtworks = category?.slug === 'silid-lona'
+    ? artworks.filter(art => {
+        if (selectedSubcategory === 'All') return true;
+        return art.subcategory === selectedSubcategory;
+      })
+    : artworks;
+
   if (!category) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
@@ -230,6 +239,32 @@ export default function CategoryPage() {
             )}
           </div>
 
+          {/* Subcategory filter toggle (Only for Silid-Lona) */}
+          {category?.slug === 'silid-lona' && (
+            <div className="flex justify-center md:justify-start mb-8 font-serif" style={{ fontFamily: 'EB Garamond, Georgia, serif' }}>
+              <div className="inline-flex rounded-full p-1 border" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-brown)' }}>
+                {['All', 'Drawing', 'Painting'].map((subcat) => {
+                  const isActive = selectedSubcategory === subcat;
+                  return (
+                    <button
+                      key={subcat}
+                      type="button"
+                      onClick={() => setSelectedSubcategory(subcat)}
+                      className="px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 select-none cursor-pointer"
+                      style={{
+                        backgroundColor: isActive ? 'var(--accent-gold)' : 'transparent',
+                        color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                        border: 'none',
+                      }}
+                    >
+                      {subcat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {loading ? (
             /* Skeleton Loading Grid Placeholders */
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -246,7 +281,7 @@ export default function CategoryPage() {
                 </div>
               ))}
             </div>
-          ) : artworks.length === 0 ? (
+          ) : filteredArtworks.length === 0 ? (
             /* Empty State */
             <div
               className="flex min-h-[300px] flex-col items-center justify-center rounded-2xl border border-dashed p-12 text-center"
@@ -256,17 +291,21 @@ export default function CategoryPage() {
               }}
             >
               <div className="mb-4 text-5xl opacity-40">&#128444;</div>
-              <h3 className="mb-2 text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
-                No artworks uploaded yet
+              <h3 className="mb-2 text-lg font-medium font-serif" style={{ color: 'var(--text-secondary)', fontFamily: 'EB Garamond, Georgia, serif' }}>
+                {artworks.length === 0
+                  ? 'No artworks uploaded yet'
+                  : `No ${selectedSubcategory} works yet.`}
               </h3>
               <p className="max-w-md text-sm" style={{ color: 'var(--text-muted)' }}>
-                Artworks for this category will appear here once they are added through the admin panel.
+                {artworks.length === 0
+                  ? 'Artworks for this category will appear here once they are added through the admin panel.'
+                  : `Artworks for this subcategory will appear here once they are added.`}
               </p>
             </div>
           ) : (
             /* Active Grid List */
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {artworks.map((artwork) => (
+              {filteredArtworks.map((artwork) => (
                 <ArtworkCard
                   key={artwork.id}
                   artwork={artwork}

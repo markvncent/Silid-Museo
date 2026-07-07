@@ -66,6 +66,15 @@ export default function ArtworkCard({ artwork, onClick }) {
           </p>
         </div>
 
+        {artwork.subcategory && (
+          <div
+            className="text-[10px] tracking-wider uppercase mb-3 select-none font-semibold"
+            style={{ color: 'var(--accent-gold)', fontVariant: 'small-caps' }}
+          >
+            {artwork.subcategory}
+          </div>
+        )}
+
         {/* Card Footer: Rating stars & Details */}
         <div className="flex items-center justify-between border-t pt-4" style={{ borderColor: 'var(--border-subtle)' }}>
           <div className="flex items-center gap-1.5">

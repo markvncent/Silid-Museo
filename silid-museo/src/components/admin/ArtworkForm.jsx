@@ -16,12 +16,16 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     categoryId || artwork?.category_id || categories[0]?.id || ''
   );
+  const [subcategory, setSubcategory] = useState(artwork?.subcategory || null);
   const [mediaType, setMediaType] = useState(artwork?.media_type || 'image');
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
+
+  const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
+  const isSilidLona = selectedCategory?.slug === 'silid-lona' || selectedCategory?.name?.includes('Silid-Lona');
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -72,6 +76,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
           title: title.trim(),
           description: description.trim(),
           media_type: mediaType,
+          subcategory: isSilidLona ? subcategory : null,
         };
         if (file) updates.media_url = mediaUrl;
         await updateArtwork(artwork.id, updates);
@@ -83,6 +88,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
           description: description.trim(),
           mediaUrl,
           mediaType,
+          subcategory: isSilidLona ? subcategory : null,
         });
       }
 
@@ -153,7 +159,15 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
             </label>
             <select
               value={selectedCategoryId}
-              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              onChange={(e) => {
+                const newCatId = e.target.value;
+                setSelectedCategoryId(newCatId);
+                const newCat = categories.find(c => c.id === newCatId);
+                const isLona = newCat?.slug === 'silid-lona' || newCat?.name?.includes('Silid-Lona');
+                if (!isLona) {
+                  setSubcategory(null);
+                }
+              }}
               className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-all duration-300 focus:ring-1 focus:ring-amber-500/30"
               style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
             >
@@ -164,6 +178,36 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
               ))}
             </select>
           </div>
+
+          {/* Subcategory (Only for Silid-Lona) */}
+          {isSilidLona && (
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                Subcategory
+              </label>
+              <div className="flex gap-2">
+                {[
+                  { label: 'None', value: null },
+                  { label: 'Drawing', value: 'Drawing' },
+                  { label: 'Painting', value: 'Painting' }
+                ].map((opt) => (
+                  <button
+                    key={opt.label}
+                    type="button"
+                    onClick={() => setSubcategory(opt.value)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 ${
+                      subcategory === opt.value
+                        ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                        : 'bg-transparent border-white/5 hover:border-white/15'
+                    }`}
+                    style={{ color: subcategory === opt.value ? undefined : 'var(--text-muted)' }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Media Type */}
           <div>

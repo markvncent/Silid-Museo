@@ -22,19 +22,23 @@ export async function getArtworkById(artworkId) {
   return data;
 }
 
-export function addArtwork({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl }) {
+export function addArtwork({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl, subcategory = null }) {
   return adminFetch('/artworks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl }),
+    body: JSON.stringify({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl, subcategory }),
   });
 }
 
 export function updateArtwork(artworkId, updates) {
+  const finalUpdates = {
+    ...updates,
+    subcategory: updates.subcategory === undefined ? null : updates.subcategory
+  };
   return adminFetch('/artworks', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ artworkId, updates }),
+    body: JSON.stringify({ artworkId, updates: finalUpdates }),
   });
 }
 
