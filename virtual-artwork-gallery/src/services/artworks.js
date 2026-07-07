@@ -22,7 +22,7 @@ export async function getArtworkById(artworkId) {
   return data;
 }
 
-export async function addArtwork({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl }) {
+export function addArtwork({ categoryId, title, description, mediaUrl, mediaType, thumbnailUrl }) {
   return adminFetch('/artworks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -30,7 +30,7 @@ export async function addArtwork({ categoryId, title, description, mediaUrl, med
   });
 }
 
-export async function updateArtwork(artworkId, updates) {
+export function updateArtwork(artworkId, updates) {
   return adminFetch('/artworks', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

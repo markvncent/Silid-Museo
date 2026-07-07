@@ -113,7 +113,7 @@ async function requireValidAdmin(
   return await verifyToken(token);
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
@@ -122,8 +122,8 @@ Deno.serve(async (req) => {
   }
 
   const url = new URL(req.url);
-  const path = url.pathname.replace("/admin", "");
-
+  const path = url.pathname.split("/admin").pop();
+  console.log("Incoming path:", path, "| Full URL:", url.pathname);
   const supabaseAdmin = createClient(
     SUPABASE_URL,
     SERVICE_ROLE_KEY
@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Protected Routes
+    // ── Everything below requires a valid room key ──
     if (!(await requireValidAdmin(req))) {
       return json(
         {
@@ -194,7 +194,80 @@ Deno.serve(async (req) => {
       );
     }
 
-    // KEEP ALL YOUR EXISTING ARTWORKS AND MEDIA ROUTES HERE
+    // ── ARTWORKS: add / update / delete ──
+    if (path === "/artworks" && req.method === "POST") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("artworks")
+        .insert({
+          category_id: body.categoryId,
+          title: body.title,
+          description: body.description,
+          media_url: body.mediaUrl,
+          media_type: body.mediaType,
+          thumbnail_url: body.thumbnailUrl ?? null,
+        })
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/artworks" && req.method === "PATCH") {
+      const body = await req.json();
+      const { data, error } = await supabaseAdmin
+        .from("artworks")
+        .update(body.updates)
+        .eq("id", body.artworkId)
+        .select()
+        .single();
+      if (error) return json({ error: error.message }, 400);
+      return json(data);
+    }
+
+    if (path === "/artworks" && req.method === "DELETE") {
+      const { artworkId } = await req.json();
+      const { error } = await supabaseAdmin
+        .from("artworks")
+        .delete()
+        .eq("id", artworkId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
+
+    // ── MEDIA: upload / delete ──
+    if (path === "/media" && req.method === "POST") {
+      const formData = await req.formData();
+      const file = formData.get("file") as File;
+      const categoryId = formData.get("categoryId") as string;
+      if (!file || !categoryId) {
+        return json({ error: "file and categoryId required" }, 400);
+      }
+
+      const ext = file.name.split(".").pop();
+      const fileName = `${categoryId}/${crypto.randomUUID()}.${ext}`;
+
+      const { data, error } = await supabaseAdmin.storage
+        .from("artwork-media")
+        .upload(fileName, file, { cacheControl: "3600", upsert: false });
+
+      if (error) return json({ error: error.message }, 400);
+
+      const { data: urlData } = supabaseAdmin.storage
+        .from("artwork-media")
+        .getPublicUrl(data.path);
+
+      return json({ path: data.path, publicUrl: urlData.publicUrl });
+    }
+
+    if (path === "/media" && req.method === "DELETE") {
+      const { path: filePath } = await req.json();
+      const { error } = await supabaseAdmin.storage
+        .from("artwork-media")
+        .remove([filePath]);
+      if (error) return json({ error: error.message }, 400);
+      return json({ success: true });
+    }
 
     return json(
       { error: "Not found" },
