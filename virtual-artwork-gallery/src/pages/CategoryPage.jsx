@@ -1,13 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import categories from '../data/categoryConfig';
-import { fallbackArtworks } from '../data/fallbackArtworks';
-import { getArtworksByCategory } from '../services/artworks';
-import { getCategoryFeedback, submitCategoryFeedback } from '../services/feedback';
-import ArtworkCard from '../components/gallery/ArtworkCard';
-import ArtworkModal from '../components/gallery/ArtworkModal';
-import { cn } from '@/lib/utils';
-import { getCategoryById } from '../services/categories';
+import categories from '../data/categoryConfig.js';
+import { fallbackArtworks } from '../data/fallbackArtworks.js';
+import { getArtworksByCategory } from '../services/artworks.js';
+import { getCategoryFeedback, submitCategoryFeedback } from '../services/feedback.js';
+import ArtworkCard from '../components/gallery/ArtworkCard.jsx';
+import ArtworkModal from '../components/gallery/ArtworkModal.jsx';
+import { getCategoryById } from '../services/categories.js';
 
 function parseCategoryName(fullName) {
   if (!fullName) return { main: "", sub: "" };
@@ -56,21 +55,21 @@ export default function CategoryPage() {
           if (fetchedCat) {
             setDbCategory(fetchedCat);
           }
-        } catch (e) {
+        } catch (_e) {
           console.warn('Failed to fetch category details from Supabase');
         }
 
         // Try fetching artworks from Supabase
         try {
           fetchedArtworks = await getArtworksByCategory(category.id);
-        } catch (e) {
+        } catch (_e) {
           console.warn('Failed to fetch from Supabase, using mock fallback artworks');
         }
 
         // Try fetching general category comments
         try {
           fetchedFeedback = await getCategoryFeedback(category.id);
-        } catch (e) {
+        } catch (_e) {
           console.warn('Failed to fetch category feedback from Supabase');
         }
       } catch (err) {
@@ -130,7 +129,7 @@ export default function CategoryPage() {
         ));
         setNewFeedback('');
         return;
-      } catch (dbErr) {
+      } catch (_dbErr) {
         console.warn('Database write failed, writing category feedback locally');
       }
 
