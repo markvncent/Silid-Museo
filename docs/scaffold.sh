@@ -1,7 +1,7 @@
 #!/bin/bash
-# Adapted for current project structure: the Vite React app is inside 'virtual-artwork-gallery'
+# Adapted for current project structure: the Vite React app is inside 'silid-museo'
 
-TARGET_DIR="virtual-artwork-gallery"
+TARGET_DIR="silid-museo"
 
 if [ ! -d "$TARGET_DIR" ]; then
   echo "Error: Target directory '$TARGET_DIR' not found."

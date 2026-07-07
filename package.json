@@ -1,9 +1,9 @@
 {
-  "name": "virtual-art-gallery-root",
+  "name": "silid-museo-root",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd virtual-artwork-gallery && npm install && npm run build",
-    "dev": "cd virtual-artwork-gallery && npm run dev"
+    "build": "cd silid-museo && npm install && npm run build",
+    "dev": "cd silid-museo && npm run dev"
   }
 }
