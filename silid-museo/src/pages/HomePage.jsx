@@ -8,7 +8,7 @@ import categories from '../data/categoryConfig';
 import { getCategories } from '../services/categories';
 import wordmarkImg from '../assets/Wordmark.png';
 import ScrollReveal from '../components/ui/ScrollReveal';
-import ParallaxTeaserImages from '../components/landing/ParallaxTeaserImages';
+import PillarBorder from '../components/landing/PillarBorder';
 
 /**
  * Map each category to a FocusRail item with a representative Unsplash image.
@@ -200,12 +200,13 @@ export default function HomePage() {
 
       {/* GALLERY / CATEGORIES SECTION */}
       <section className="relative py-24" id="gallery">
+        <PillarBorder />
         <div
           className="absolute inset-0 transition-colors duration-300"
           style={{ backgroundColor: 'var(--bg-primary)' }}
         />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6">
+        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-[250px]">
           {/* Section Header */}
           <div className="mb-16 text-center">
             <h2
@@ -283,47 +284,40 @@ export default function HomePage() {
           />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6">
-          <div className="grid items-center gap-12 md:grid-cols-2">
-            <div className="flex flex-col justify-center">
-              <ScrollReveal
-                enableBlur={true}
-                baseOpacity={0.1}
-                baseRotation={4}
-                blurStrength={6}
-                containerClassName="mb-6"
-                textClassName="!text-3xl sm:!text-4xl md:!text-5xl font-heading text-theme-primary leading-tight"
-              >
-                {"A Space for Every Art Form"}
-              </ScrollReveal>
-              
-              <ScrollReveal
-                enableBlur={true}
-                baseOpacity={0.1}
-                baseRotation={2}
-                blurStrength={4}
-                containerClassName="mb-6"
-                textClassName="!text-base sm:!text-lg leading-snug text-theme-secondary font-sans !font-normal"
-              >
-                {"This virtual gallery is designed to celebrate the diversity of artistic expression. From traditional paintings to digital compositions, from poetry to film, every medium has a dedicated space to shine."}
-              </ScrollReveal>
-              
-              <ScrollReveal
-                enableBlur={true}
-                baseOpacity={0.1}
-                baseRotation={2}
-                blurStrength={4}
-                containerClassName="mb-6"
-                textClassName="!text-base sm:!text-lg leading-snug text-theme-muted font-sans !font-normal"
-              >
-                {"Rate your favorite pieces, leave feedback, and immerse yourself in a curated experience that bridges the gap between artist and audience."}
-              </ScrollReveal>
-            </div>
-
-            {/* Parallax Scrolling Images Stack */}
-            <div className="flex items-center justify-center">
-              <ParallaxTeaserImages />
-            </div>
+        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
+          <div className="flex flex-col items-center justify-center">
+            <ScrollReveal
+              enableBlur={true}
+              baseOpacity={0.1}
+              baseRotation={4}
+              blurStrength={6}
+              containerClassName="mb-6 mx-auto text-center"
+              textClassName="!text-3xl sm:!text-4xl md:!text-5xl font-heading text-theme-primary leading-tight text-center"
+            >
+              {"A Space for Every Art Form"}
+            </ScrollReveal>
+            
+            <ScrollReveal
+              enableBlur={true}
+              baseOpacity={0.1}
+              baseRotation={2}
+              blurStrength={4}
+              containerClassName="mb-6 mx-auto text-center"
+              textClassName="!text-base sm:!text-lg leading-snug text-theme-secondary font-sans !font-normal text-center"
+            >
+              {"This virtual gallery is designed to celebrate the diversity of artistic expression. From traditional paintings to digital compositions, from poetry to film, every medium has a dedicated space to shine."}
+            </ScrollReveal>
+            
+            <ScrollReveal
+              enableBlur={true}
+              baseOpacity={0.1}
+              baseRotation={2}
+              blurStrength={4}
+              containerClassName="mb-6 mx-auto text-center"
+              textClassName="!text-base sm:!text-lg leading-snug text-theme-muted font-sans !font-normal text-center"
+            >
+              {"Rate your favorite pieces, leave feedback, and immerse yourself in a curated experience that bridges the gap between artist and audience."}
+            </ScrollReveal>
           </div>
         </div>
       </section>
