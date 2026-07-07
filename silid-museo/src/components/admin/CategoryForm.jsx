@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updateCategory } from '../../services/categories';
+import { updateCategory } from '../../services/categories.js';
 
 /**
  * Inline edit form for a single category's details (FR-5.6).

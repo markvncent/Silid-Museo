@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { uploadMedia, detectMediaType } from '../../services/storage';
-import { addArtwork, updateArtwork } from '../../services/artworks';
-import categories from '../../data/categoryConfig';
+import { uploadMedia, detectMediaType } from '../../services/storage.js';
+import { addArtwork, updateArtwork } from '../../services/artworks.js';
+import categories from '../../data/categoryConfig.js';
 
 /**
  * Modal form for adding or editing an artwork (FR-5.3, FR-5.4).
@@ -104,6 +104,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
       >
         {/* Close */}
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-800/80 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-all"
         >
