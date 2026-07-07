@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import categories from '../data/categoryConfig';
-import { getCategories } from '../services/categories';
-import { getArtworksByCategory, deleteArtwork } from '../services/artworks';
-import { deleteMedia } from '../services/storage';
-import ArtworkForm from '../components/admin/ArtworkForm';
-import CategoryForm from '../components/admin/CategoryForm';
-import ModerationList from '../components/admin/ModerationList';
+import categories from '../data/categoryConfig.js';
+import { getCategories } from '../services/categories.js';
+import { getArtworksByCategory, deleteArtwork } from '../services/artworks.js';
+import { deleteMedia } from '../services/storage.js';
+import ArtworkForm from '../components/admin/ArtworkForm.jsx';
+import CategoryForm from '../components/admin/CategoryForm.jsx';
+import ModerationList from '../components/admin/ModerationList.jsx';
 
 const TABS = [
   { key: 'artworks', label: 'Artworks' },
@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
     try {
       const data = await getCategories();
       setDbCategories(data || []);
-    } catch (err) {
+    } catch (_err) {
       console.warn('Failed to load categories from DB, using local config');
       setDbCategories([]);
     } finally {
@@ -134,6 +134,7 @@ export default function AdminDashboardPage() {
           {TABS.map((tab) => (
             <button
               key={tab.key}
+              type="button"
               onClick={() => setActiveTab(tab.key)}
               className={`w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 text-left ${
                 activeTab === tab.key
@@ -156,6 +157,7 @@ export default function AdminDashboardPage() {
         {/* Exit Admin Mode — pinned at bottom */}
         <div className="px-3 py-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
           <button
+            type="button"
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-medium transition-all duration-300 hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-muted)' }}
@@ -211,6 +213,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => { setEditingArtwork(null); setShowArtworkForm(true); }}
                   className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold text-white transition-all duration-200 hover:brightness-110 hover:shadow-lg shadow-amber-500/10"
                   style={{ backgroundColor: 'var(--accent-gold)' }}
@@ -242,6 +245,7 @@ export default function AdminDashboardPage() {
                     Upload the first artwork to this category.
                   </p>
                   <button
+                    type="button"
                     onClick={() => { setEditingArtwork(null); setShowArtworkForm(true); }}
                     className="rounded-lg px-4 py-2 text-xs font-semibold text-white hover:brightness-110 transition-all"
                     style={{ backgroundColor: 'var(--accent-gold)' }}
@@ -309,6 +313,7 @@ export default function AdminDashboardPage() {
                         {/* Actions */}
                         <div className="flex gap-1.5 justify-end w-28">
                           <button
+                            type="button"
                             onClick={() => { setEditingArtwork(art); setShowArtworkForm(true); }}
                             className="rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all duration-200 hover:bg-white/5 hover:border-white/15"
                             style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-muted)' }}
@@ -316,6 +321,7 @@ export default function AdminDashboardPage() {
                             Edit
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeleteArtwork(art)}
                             disabled={deletingArtworkId === art.id}
                             className="rounded-lg border border-red-500/20 bg-red-500/5 px-2.5 py-1.5 text-[11px] font-medium text-red-400 transition-all duration-200 hover:bg-red-500/15 disabled:opacity-40"
