@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollHero from '../components/landing/ScrollHero';
 import { FocusRail } from '../components/ui/focus-rail';
@@ -174,8 +175,8 @@ export default function HomePage() {
                 <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
               </a>
 
-              <a
-                href="/about"
+              <Link
+                to="/about"
                 className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300"
                 style={{
                   border: '1px solid var(--border-subtle)',
@@ -184,7 +185,7 @@ export default function HomePage() {
                 id="cta-about"
               >
                 Learn More
-              </a>
+              </Link>
             </div>
           </div>
         </div>
