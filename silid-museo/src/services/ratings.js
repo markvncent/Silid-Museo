@@ -1,4 +1,7 @@
 import { supabase } from '../lib/supabase.js';
+import { adminFetch } from './adminApi.js';
+
+/* ─── Public: visitors submitting/reading their own ratings ─── */
 
 /**
  * Submits a rating for an artwork.
@@ -48,6 +51,8 @@ export async function getAverageRating(artworkId) {
     return data ?? { average_rating: 0, rating_count: 0 };
 }
 
+/* ─── Admin: moderation panel (reads stay direct, writes go through the Edge Function) ─── */
+
 /**
  * Fetches ALL ratings across all artworks (for admin moderation).
  * Joins with the artworks table to include the artwork title.
@@ -67,18 +72,34 @@ export async function getAllRatings() {
 }
 
 /**
+ * Creates a rating from the admin panel (goes through the Edge Function).
+ */
+export function createRatingAdmin(artworkId, score, voterToken = null) {
+    return adminFetch('/ratings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artworkId, score, voterToken }),
+    });
+}
+
+/**
+ * Updates a rating entry (admin moderation).
+ */
+export function updateRating(ratingId, updates) {
+    return adminFetch('/ratings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ratingId, updates }),
+    });
+}
+
+/**
  * Deletes a single rating entry (admin moderation).
  */
-export async function deleteRating(ratingId) {
-    const { error } = await supabase
-        .from('ratings')
-        .delete()
-        .eq('id', ratingId);
-
-    if (error) {
-        console.error('Failed to delete rating:', error.message);
-        throw error;
-    }
-
-    return true;
+export function deleteRating(ratingId) {
+    return adminFetch('/ratings', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ratingId }),
+    });
 }

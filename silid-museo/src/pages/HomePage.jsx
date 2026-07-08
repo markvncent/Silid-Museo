@@ -1,15 +1,15 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import ScrollHero from '../components/landing/ScrollHero';
-import { FocusRail } from '../components/ui/focus-rail';
-import AnimatedRays from '@/components/ui/animated-rays';
-import Particles from '@/components/ui/Particles';
-import categories from '../data/categoryConfig';
-import { getCategories } from '../services/categories';
+import ScrollHero from '../components/landing/ScrollHero.jsx';
+import { FocusRail } from '../components/ui/focus-rail.jsx';
+import AnimatedRays from '@/components/ui/animated-rays.jsx';
+import Particles from '@/components/ui/Particles.jsx';
+import categories from '../data/categoryConfig.js';
+import { getCategories } from '../services/categories.js';
 import wordmarkImg from '../assets/Wordmark.png';
-import ScrollReveal from '../components/ui/ScrollReveal';
-import PillarBorder from '../components/landing/PillarBorder';
+import ScrollReveal from '../components/ui/ScrollReveal.jsx';
+import PillarBorder from '../components/landing/PillarBorder.jsx';
 
 /**
  * Map each category to a FocusRail item with a representative Unsplash image.
