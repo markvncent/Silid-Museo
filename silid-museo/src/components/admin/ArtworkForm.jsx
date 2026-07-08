@@ -215,7 +215,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
               Media Type
             </label>
             <div className="flex gap-2 flex-wrap">
-              {['image', 'audio', 'video', 'text', 'sculpture'].map((type) => (
+              {['image', 'audio', 'video', 'pdf', 'text', 'sculpture'].map((type) => (
                 <button
                   key={type}
                   type="button"

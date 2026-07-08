@@ -47,7 +47,17 @@ export default function MediaPlayer({ mediaUrl, mediaType, title }) {
           />
         </div>
       );
-
+  case 'pdf':
+    return (
+      <div className="w-full aspect-[4/3] md:aspect-video rounded-xl overflow-hidden bg-neutral-900 border border-white/5">
+        <iframe
+          src={mediaUrl}
+          title={title}
+          className="w-full h-full"
+          style={{ border: 'none' }}
+        />
+      </div>
+    );
     case 'text':
     default:
       return (

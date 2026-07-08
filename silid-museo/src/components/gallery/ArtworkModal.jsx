@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import MediaPlayer from './MediaPlayer';
-import { submitRating, getAverageRating } from '../../services/ratings';
-import { submitArtworkFeedback, getArtworkFeedback } from '../../services/feedback';
+import MediaPlayer from './MediaPlayer.jsx';
+import { submitRating, getAverageRating } from '../../services/ratings.js';
+import { submitArtworkFeedback, getArtworkFeedback } from '../../services/feedback.js';
 
 export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
   const { id, title, description, media_url, media_type, is_fallback } = artwork;
