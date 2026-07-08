@@ -10,7 +10,6 @@ import {
 } from '../../services/feedback.js';
 import {
   getAllRatings,
-  createRatingAdmin,
   updateRating,
   deleteRating,
 } from '../../services/ratings.js';
@@ -97,22 +96,7 @@ export default function ModerationList() {
 
 
 
-  const handleCreateRating = async () => {
-    if (!newTargetId) return;
-    setBusyId('new');
-    try {
-      const created = await createRatingAdmin(newTargetId, newScore);
-      const artwork = artworkOptions.find((a) => a.id === newTargetId);
-      setRatings((prev) => [{ ...created, artworks: artwork }, ...prev]);
-      setNewTargetId('');
-      setNewScore(5);
-    } catch (err) {
-      console.error(err);
-      await showAlert('Failed to add rating.');
-    } finally {
-      setBusyId(null);
-    }
-  };
+
 
   /* ── Edit ────────────────────────────────────────── */
 
@@ -312,15 +296,6 @@ export default function ModerationList() {
           {/* Ratings */}
           {activeSubTab === 'ratings' && (
             <div className="space-y-2">
-              <NewRatingForm
-                options={artworkOptions.map((a) => ({ value: a.id, label: a.title }))}
-                targetId={newTargetId}
-                onTargetChange={setNewTargetId}
-                score={newScore}
-                onScoreChange={setNewScore}
-                onSubmit={handleCreateRating}
-                busy={busyId === 'new'}
-              />
               {ratings.length === 0 ? (
                 <EmptyState message="No ratings found." />
               ) : (
@@ -355,33 +330,7 @@ export default function ModerationList() {
 
 
 
-function NewRatingForm({ options, targetId, onTargetChange, score, onScoreChange, onSubmit, busy }) {
-  return (
-    <div className="rounded-xl border p-4 space-y-2" style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-subtle)' }}>
-      <div className="text-[11px] font-semibold text-amber-500/70">Add Rating</div>
-      <select
-        value={targetId}
-        onChange={(e) => onTargetChange(e.target.value)}
-        className="w-full rounded-lg border bg-transparent px-2 py-1.5 text-xs"
-        style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
-      >
-        <option value="">Select artwork…</option>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-      <StarPicker score={score} onChange={onScoreChange} />
-      <button
-      type="button"
-        onClick={onSubmit}
-        disabled={busy || !targetId}
-        className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-400 disabled:opacity-40"
-      >
-        {busy ? 'Adding…' : 'Add Rating'}
-      </button>
-    </div>
-  );
-}
+
 
 function StarPicker({ score, onChange }) {
   return (
