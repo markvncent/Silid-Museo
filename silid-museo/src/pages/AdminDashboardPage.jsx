@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useModal } from '../context/ModalContext';
 import categories from '../data/categoryConfig.js';
 import { getCategories } from '../services/categories.js';
 import { getArtworksByCategory, deleteArtwork } from '../services/artworks.js';
@@ -16,6 +17,7 @@ const TABS = [
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
+  const { showAlert, showConfirm } = useModal();
 
   // ── Global State ───────────────────────────────────
   const [activeTab, setActiveTab] = useState('artworks');
@@ -76,7 +78,8 @@ export default function AdminDashboardPage() {
   };
 
   const handleDeleteArtwork = async (art) => {
-    if (!confirm(`Delete "${art.title}"? This cannot be undone.`)) return;
+    const confirmed = await showConfirm(`Delete "${art.title}"? This cannot be undone.`);
+    if (!confirmed) return;
     setDeletingArtworkId(art.id);
     try {
       if (art.media_url) {
@@ -92,7 +95,7 @@ export default function AdminDashboardPage() {
       setArtworks((prev) => prev.filter((a) => a.id !== art.id));
     } catch (err) {
       console.error(err);
-      alert('Failed to delete artwork. Check Supabase RLS policies.');
+      await showAlert('Failed to delete artwork. Check Supabase RLS policies.');
     } finally {
       setDeletingArtworkId(null);
     }

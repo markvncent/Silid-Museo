@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useModal } from '../../context/ModalContext.jsx';
 import {
   getAllArtworkFeedback,
   getAllCategoryFeedback,
-  createArtworkFeedbackAdmin,
   updateArtworkFeedback,
   deleteArtworkFeedback,
-  createCategoryFeedbackAdmin,
   updateCategoryFeedback,
   deleteCategoryFeedback,
 } from '../../services/feedback.js';
@@ -29,6 +28,7 @@ const SUB_TABS = [
  * feedback/ratings (FR-5.7).
  */
 export default function ModerationList() {
+  const { showAlert, showConfirm } = useModal();
   const [activeSubTab, setActiveSubTab] = useState('artwork_comments');
   const [artworkFeedback, setArtworkFeedback] = useState([]);
   const [categoryFeedback, setCategoryFeedback] = useState([]);
@@ -95,39 +95,7 @@ export default function ModerationList() {
 
   /* ── Create ──────────────────────────────────────── */
 
-  const handleCreateArtworkComment = async () => {
-    if (!newTargetId || !newText.trim()) return;
-    setBusyId('new');
-    try {
-      const created = await createArtworkFeedbackAdmin(newTargetId, newText.trim());
-      const artwork = artworkOptions.find((a) => a.id === newTargetId);
-      setArtworkFeedback((prev) => [{ ...created, artworks: artwork }, ...prev]);
-      setNewTargetId('');
-      setNewText('');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add comment.');
-    } finally {
-      setBusyId(null);
-    }
-  };
 
-  const handleCreateCategoryComment = async () => {
-    if (!newTargetId || !newText.trim()) return;
-    setBusyId('new');
-    try {
-      const created = await createCategoryFeedbackAdmin(newTargetId, newText.trim());
-      const category = { name: categoryLookup[newTargetId] };
-      setCategoryFeedback((prev) => [{ ...created, categories: category }, ...prev]);
-      setNewTargetId('');
-      setNewText('');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add comment.');
-    } finally {
-      setBusyId(null);
-    }
-  };
 
   const handleCreateRating = async () => {
     if (!newTargetId) return;
@@ -140,7 +108,7 @@ export default function ModerationList() {
       setNewScore(5);
     } catch (err) {
       console.error(err);
-      alert('Failed to add rating.');
+      await showAlert('Failed to add rating.');
     } finally {
       setBusyId(null);
     }
@@ -167,7 +135,7 @@ export default function ModerationList() {
       cancelEdit();
     } catch (err) {
       console.error(err);
-      alert('Failed to save edit.');
+      await showAlert('Failed to save edit.');
     } finally {
       setBusyId(null);
     }
@@ -181,7 +149,7 @@ export default function ModerationList() {
       cancelEdit();
     } catch (err) {
       console.error(err);
-      alert('Failed to save edit.');
+      await showAlert('Failed to save edit.');
     } finally {
       setBusyId(null);
     }
@@ -195,7 +163,7 @@ export default function ModerationList() {
       cancelEdit();
     } catch (err) {
       console.error(err);
-      alert('Failed to save edit.');
+      await showAlert('Failed to save edit.');
     } finally {
       setBusyId(null);
     }
@@ -204,42 +172,45 @@ export default function ModerationList() {
   /* ── Delete ──────────────────────────────────────── */
 
   const handleDeleteArtworkFeedback = async (id) => {
-    if (!confirm('Delete this comment?')) return;
+    const confirmed = await showConfirm('Delete this comment?');
+    if (!confirmed) return;
     setBusyId(id);
     try {
       await deleteArtworkFeedback(id);
       setArtworkFeedback((prev) => prev.filter((f) => f.id !== id));
     } catch (err) {
       console.error(err);
-      alert('Failed to delete. Check Supabase RLS policies.');
+      await showAlert('Failed to delete. Check Supabase RLS policies.');
     } finally {
       setBusyId(null);
     }
   };
 
   const handleDeleteCategoryFeedback = async (id) => {
-    if (!confirm('Delete this comment?')) return;
+    const confirmed = await showConfirm('Delete this comment?');
+    if (!confirmed) return;
     setBusyId(id);
     try {
       await deleteCategoryFeedback(id);
       setCategoryFeedback((prev) => prev.filter((f) => f.id !== id));
     } catch (err) {
       console.error(err);
-      alert('Failed to delete. Check Supabase RLS policies.');
+      await showAlert('Failed to delete. Check Supabase RLS policies.');
     } finally {
       setBusyId(null);
     }
   };
 
   const handleDeleteRating = async (id) => {
-    if (!confirm('Delete this rating?')) return;
+    const confirmed = await showConfirm('Delete this rating?');
+    if (!confirmed) return;
     setBusyId(id);
     try {
       await deleteRating(id);
       setRatings((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       console.error(err);
-      alert('Failed to delete. Check Supabase RLS policies.');
+      await showAlert('Failed to delete. Check Supabase RLS policies.');
     } finally {
       setBusyId(null);
     }
@@ -288,16 +259,6 @@ export default function ModerationList() {
           {/* Artwork Comments */}
           {activeSubTab === 'artwork_comments' && (
             <div className="space-y-2">
-              <NewCommentForm
-                targetLabel="Artwork"
-                options={artworkOptions.map((a) => ({ value: a.id, label: a.title }))}
-                targetId={newTargetId}
-                onTargetChange={setNewTargetId}
-                text={newText}
-                onTextChange={setNewText}
-                onSubmit={handleCreateArtworkComment}
-                busy={busyId === 'new'}
-              />
               {artworkFeedback.length === 0 ? (
                 <EmptyState message="No artwork comments found." />
               ) : (
@@ -325,16 +286,6 @@ export default function ModerationList() {
           {/* Category Comments */}
           {activeSubTab === 'category_comments' && (
             <div className="space-y-2">
-              <NewCommentForm
-                targetLabel="Category"
-                options={categories.map((c) => ({ value: c.id, label: c.name }))}
-                targetId={newTargetId}
-                onTargetChange={setNewTargetId}
-                text={newText}
-                onTextChange={setNewText}
-                onSubmit={handleCreateCategoryComment}
-                busy={busyId === 'new'}
-              />
               {categoryFeedback.length === 0 ? (
                 <EmptyState message="No category comments found." />
               ) : (
@@ -402,40 +353,7 @@ export default function ModerationList() {
 
 /* ─── Sub-components ────────────────────────────────── */
 
-function NewCommentForm({ targetLabel, options, targetId, onTargetChange, text, onTextChange, onSubmit, busy }) {
-  return (
-    <div className="rounded-xl border p-4 space-y-2" style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-subtle)' }}>
-      <div className="text-[11px] font-semibold text-amber-500/70">Add {targetLabel} Comment</div>
-      <select
-        value={targetId}
-        onChange={(e) => onTargetChange(e.target.value)}
-        className="w-full rounded-lg border bg-transparent px-2 py-1.5 text-xs"
-        style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
-      >
-        <option value="">Select {targetLabel.toLowerCase()}…</option>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
-      <textarea
-        value={text}
-        onChange={(e) => onTextChange(e.target.value)}
-        placeholder="Comment text…"
-        rows={2}
-        className="w-full rounded-lg border bg-transparent px-2 py-1.5 text-xs resize-none"
-        style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
-      />
-      <button
-      type="button"
-        onClick={onSubmit}
-        disabled={busy || !targetId || !text.trim()}
-        className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-400 disabled:opacity-40"
-      >
-        {busy ? 'Adding…' : 'Add Comment'}
-      </button>
-    </div>
-  );
-}
+
 
 function NewRatingForm({ options, targetId, onTargetChange, score, onScoreChange, onSubmit, busy }) {
   return (
