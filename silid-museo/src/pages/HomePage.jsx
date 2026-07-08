@@ -1,10 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollHero from '../components/landing/ScrollHero.jsx';
 import { FocusRail } from '../components/ui/focus-rail.jsx';
-import AnimatedRays from '@/components/ui/animated-rays.jsx';
-import Particles from '@/components/ui/Particles.jsx';
+import AnimatedRays from '../components/ui/animated-rays.jsx';
+import Particles from '../components/ui/Particles.jsx';
 import categories from '../data/categoryConfig.js';
 import { getCategories } from '../services/categories.js';
 import wordmarkImg from '../assets/Wordmark.png';
@@ -227,7 +227,7 @@ export default function HomePage() {
             <FocusRail
               items={railItems}
               autoPlay={false}
-              loop={true}
+              loop
               className="rounded-2xl"
             />
           ) : (
@@ -288,7 +288,7 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
           <div className="flex flex-col items-center justify-center">
             <ScrollReveal
-              enableBlur={true}
+              enableBlur
               baseOpacity={0.1}
               baseRotation={4}
               blurStrength={6}
@@ -299,7 +299,7 @@ export default function HomePage() {
             </ScrollReveal>
             
             <ScrollReveal
-              enableBlur={true}
+              enableBlur
               baseOpacity={0.1}
               baseRotation={2}
               blurStrength={4}
@@ -310,7 +310,7 @@ export default function HomePage() {
             </ScrollReveal>
             
             <ScrollReveal
-              enableBlur={true}
+              enableBlur
               baseOpacity={0.1}
               baseRotation={2}
               blurStrength={4}
