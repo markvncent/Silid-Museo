@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import MediaPlayer from './MediaPlayer.jsx';
 import { submitRating, getAverageRating } from '../../services/ratings.js';
 import { submitArtworkFeedback, getArtworkFeedback } from '../../services/feedback.js';
@@ -37,7 +36,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
       if (!is_fallback) {
         try {
           dbComments = await getArtworkFeedback(id);
-        } catch (e) {
+        } catch (_e) {
           console.warn('Could not load comments from Supabase, using local fallback only');
         }
       }
@@ -66,7 +65,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
             localStorage.setItem('voter_token', voterToken);
           }
           await submitRating(id, score, voterToken);
-        } catch (e) {
+        } catch (_e) {
           console.warn('Database submit failed, storing rating locally instead');
         }
       }
@@ -87,7 +86,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
           try {
             const summary = await getAverageRating(id);
             onUpdateArtwork(id, { artwork_ratings_summary: summary });
-          } catch (e) {
+          } catch (_e) {
             updateLocalAverage(score);
           }
         } else {
@@ -135,7 +134,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
           loadComments();
           setNewComment('');
           return;
-        } catch (err) {
+        } catch (_err) {
           console.warn('Database submit failed, storing comment locally instead');
         }
       }
@@ -163,6 +162,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
       >
         {/* Close Button */}
         <button
+        type="button"
           onClick={onClose}
           className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-neutral-400 hover:text-white hover:bg-black/95 transition-all duration-300 border border-white/5"
         >
@@ -197,6 +197,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
+                  type ="button"
                     key={star}
                     disabled={hasVoted}
                     onMouseEnter={() => !hasVoted && setHoverRating(star)}
