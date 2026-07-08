@@ -17,7 +17,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
 
   // Load local votes and comments from localStorage (especially for fallback items)
-  useEffect(() => {
+useEffect(() => {
     // 1. Check if voted
     const localVotes = JSON.parse(localStorage.getItem('gallery_votes') || '{}');
     if (localVotes[id]) {
@@ -25,9 +25,11 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
       setVotedScore(localVotes[id]);
       setRating(localVotes[id]);
     }
-
     // 2. Load comments
     loadComments();
+
+    // 3. Load rating summary
+    loadRatingSummary();
   }, [id]);
 
   const loadComments = async () => {
@@ -49,6 +51,17 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
       setComments(combined);
     } catch (err) {
       console.error(err);
+    }
+  };
+  const loadRatingSummary = async () => {
+    if (is_fallback) return;
+    try {
+      const summary = await getAverageRating(id);
+      if (onUpdateArtwork) {
+        onUpdateArtwork(id, { artwork_ratings_summary: summary });
+      }
+    } catch (err) {
+      console.warn('Could not load rating summary:', err.message);
     }
   };
 

@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { FileText } from 'lucide-react';
 
 export default function MediaPlayer({ mediaUrl, mediaType, title, thumbnailUrl }) {
