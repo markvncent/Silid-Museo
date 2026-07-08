@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useModal } from '../context/ModalContext';
+import { Music, Video, FileText, Shapes, AlignLeft } from 'lucide-react';
 import categories from '../data/categoryConfig.js';
 import { getCategories } from '../services/categories.js';
 import { getArtworksByCategory, deleteArtwork } from '../services/artworks.js';
@@ -272,9 +273,6 @@ export default function AdminDashboardPage() {
 
                   {/* Table Rows */}
                   {artworks.map((art) => {
-                    const displayImage = art.thumbnail_url || (art.media_type === 'audio'
-                      ? 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=100&auto=format&fit=crop'
-                      : art.media_url);
                     const avgRating = art.artwork_ratings_summary?.average_rating || 0;
 
                     return (
@@ -284,9 +282,21 @@ export default function AdminDashboardPage() {
                         style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
                       >
                         {/* Preview Thumbnail */}
-                        <div className="w-14 h-10 rounded-lg overflow-hidden bg-neutral-900 border border-white/5 shrink-0">
-                          {displayImage && (
-                            <img src={displayImage} alt={art.title} className="h-full w-full object-cover" />
+                        <div className="w-14 h-10 rounded-lg overflow-hidden bg-neutral-900 border border-white/5 shrink-0 flex items-center justify-center">
+                          {art.thumbnail_url || art.media_type === 'image' ? (
+                            <img 
+                              src={art.thumbnail_url || art.media_url} 
+                              alt={art.title} 
+                              className="h-full w-full object-cover" 
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-neutral-950">
+                              {art.media_type === 'audio' && <Music className="w-5 h-5 text-amber-500" />}
+                              {art.media_type === 'video' && <Video className="w-5 h-5 text-amber-500" />}
+                              {art.media_type === 'pdf' && <FileText className="w-5 h-5 text-amber-500" />}
+                              {art.media_type === 'text' && <AlignLeft className="w-5 h-5 text-amber-500" />}
+                              {art.media_type === 'sculpture' && <Shapes className="w-5 h-5 text-amber-500" />}
+                            </div>
                           )}
                         </div>
 

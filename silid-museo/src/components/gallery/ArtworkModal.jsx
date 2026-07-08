@@ -1,9 +1,10 @@
+import { useState, useEffect } from 'react';
 import MediaPlayer from './MediaPlayer.jsx';
 import { submitRating, getAverageRating } from '../../services/ratings.js';
 import { submitArtworkFeedback, getArtworkFeedback } from '../../services/feedback.js';
 
 export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
-  const { id, title, description, media_url, media_type, is_fallback } = artwork;
+  const { id, title, description, media_url, media_type, thumbnail_url, is_fallback } = artwork;
 
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -171,7 +172,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
 
         {/* Left Side: Media Display */}
         <div className="flex flex-1 items-center justify-center bg-neutral-900/40 p-6 md:p-8 border-b md:border-b-0 md:border-r" style={{ borderColor: 'var(--border-subtle)' }}>
-          <MediaPlayer mediaUrl={media_url} mediaType={media_type} title={title} />
+          <MediaPlayer mediaUrl={media_url} mediaType={media_type} title={title} thumbnailUrl={thumbnail_url} />
         </div>
 
         {/* Right Side: Info & Interactions */}
@@ -181,7 +182,7 @@ export default function ArtworkModal({ artwork, onClose, onUpdateArtwork }) {
             <h2 className="text-2xl font-bold mb-3 tracking-tight" style={{ color: 'var(--text-primary)' }}>
               {title}
             </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-muted)' }}>
               {description}
             </p>
           </div>

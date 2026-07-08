@@ -20,9 +20,12 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
   const [mediaType, setMediaType] = useState(artwork?.media_type || 'image');
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [thumbnailDragActive, setThumbnailDragActive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef(null);
+  const thumbnailInputRef = useRef(null);
 
   const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
   const isSilidLona = selectedCategory?.slug === 'silid-lona' || selectedCategory?.name?.includes('Silid-Lona');
@@ -41,7 +44,11 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
     if (e.dataTransfer.files?.[0]) {
       const dropped = e.dataTransfer.files[0];
       setFile(dropped);
-      setMediaType(detectMediaType(dropped));
+      const type = detectMediaType(dropped);
+      setMediaType(type);
+      if (type === 'image') {
+        setThumbnailFile(null);
+      }
     }
   };
 
@@ -49,7 +56,43 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
     const selected = e.target.files?.[0];
     if (selected) {
       setFile(selected);
-      setMediaType(detectMediaType(selected));
+      const type = detectMediaType(selected);
+      setMediaType(type);
+      if (type === 'image') {
+        setThumbnailFile(null);
+      }
+    }
+  };
+
+  const handleThumbnailDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') setThumbnailDragActive(true);
+    else if (e.type === 'dragleave') setThumbnailDragActive(false);
+  };
+
+  const handleThumbnailDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setThumbnailDragActive(false);
+    if (e.dataTransfer.files?.[0]) {
+      const dropped = e.dataTransfer.files[0];
+      if (dropped.type.startsWith('image/')) {
+        setThumbnailFile(dropped);
+      } else {
+        setError('Thumbnail must be an image file.');
+      }
+    }
+  };
+
+  const handleThumbnailFileChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (selected) {
+      if (selected.type.startsWith('image/')) {
+        setThumbnailFile(selected);
+      } else {
+        setError('Thumbnail must be an image file.');
+      }
     }
   };
 
@@ -63,11 +106,23 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
 
     try {
       let mediaUrl = artwork?.media_url || '';
+      let thumbnailUrl = artwork?.thumbnail_url || null;
 
-      // Upload new file if provided
+      // Upload new media file if provided
       if (file) {
         const result = await uploadMedia(file, selectedCategoryId);
         mediaUrl = result.publicUrl;
+      }
+
+      // Upload new thumbnail image if provided
+      if (mediaType !== 'image') {
+        if (thumbnailFile) {
+          const thumbResult = await uploadMedia(thumbnailFile, selectedCategoryId);
+          thumbnailUrl = thumbResult.publicUrl;
+        }
+      } else {
+        // If media type is image, thumbnail is redundant/not needed
+        thumbnailUrl = null;
       }
 
       if (isEdit) {
@@ -77,6 +132,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
           description: description.trim(),
           media_type: mediaType,
           subcategory: isSilidLona ? subcategory : null,
+          thumbnail_url: thumbnailUrl,
         };
         if (file) updates.media_url = mediaUrl;
         await updateArtwork(artwork.id, updates);
@@ -88,6 +144,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
           description: description.trim(),
           mediaUrl,
           mediaType,
+          thumbnailUrl,
           subcategory: isSilidLona ? subcategory : null,
         });
       }
@@ -210,6 +267,7 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
           )}
 
           {/* Media Type */}
+          {/* Media Type */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>
               Media Type
@@ -219,7 +277,12 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
                 <button
                   key={type}
                   type="button"
-                  onClick={() => setMediaType(type)}
+                  onClick={() => {
+                    setMediaType(type);
+                    if (type === 'image') {
+                      setThumbnailFile(null);
+                    }
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize border transition-all duration-200 ${
                     mediaType === type
                       ? 'bg-amber-500/15 text-amber-400 border-amber-500/30'
@@ -277,6 +340,63 @@ export default function ArtworkForm({ artwork, categoryId, onClose, onSaved }) {
               )}
             </div>
           </div>
+
+          {/* Thumbnail / Cover Image (Only for non-image media types) */}
+          {mediaType !== 'image' && (
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                Thumbnail / Cover Image (Optional)
+              </label>
+              <div
+                onDragEnter={handleThumbnailDrag}
+                onDragLeave={handleThumbnailDrag}
+                onDragOver={handleThumbnailDrag}
+                onDrop={handleThumbnailDrop}
+                onClick={() => thumbnailInputRef.current?.click()}
+                className={`relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-all duration-300 ${
+                  thumbnailDragActive
+                    ? 'border-amber-500/50 bg-amber-500/5'
+                    : 'border-white/10 hover:border-white/20 bg-neutral-900/30'
+                }`}
+              >
+                <input
+                  ref={thumbnailInputRef}
+                  type="file"
+                  onChange={handleThumbnailFileChange}
+                  className="hidden"
+                  accept="image/*"
+                />
+                {thumbnailFile ? (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                      {thumbnailFile.name}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      {(thumbnailFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                ) : artwork?.thumbnail_url ? (
+                  <div className="space-y-2">
+                    <img
+                      src={artwork.thumbnail_url}
+                      alt="Current thumbnail"
+                      className="mx-auto h-20 w-auto rounded border border-white/10 object-cover"
+                    />
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      Drag & drop a new thumbnail here, or <span className="text-amber-500 font-medium">browse</span> to replace
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium opacity-30" style={{ color: 'var(--text-muted)' }}>Upload Thumbnail</div>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      Drag & drop an image here, or <span className="text-amber-500 font-medium">browse</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Error */}
           {error && (

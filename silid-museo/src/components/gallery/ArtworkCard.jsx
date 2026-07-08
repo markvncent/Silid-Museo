@@ -1,4 +1,13 @@
 import React from 'react';
+import { Music, Video, FileText, Shapes, AlignLeft } from 'lucide-react';
+
+const fallbackIcons = {
+  audio: Music,
+  video: Video,
+  pdf: FileText,
+  text: AlignLeft,
+  sculpture: Shapes,
+};
 
 export default function ArtworkCard({ artwork, onClick }) {
   const { title, description, thumbnail_url, media_url, media_type, artwork_ratings_summary, is_fallback } = artwork;
@@ -8,9 +17,8 @@ export default function ArtworkCard({ artwork, onClick }) {
   const ratingCount = artwork_ratings_summary?.rating_count || 0;
 
   // Use thumbnail or fallback media url
-  const displayImage = thumbnail_url || (media_type === 'audio' 
-    ? 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=500&auto=format&fit=crop'
-    : media_url);
+  const displayImage = thumbnail_url || (media_type === 'image' ? media_url : null);
+  const IconComponent = fallbackIcons[media_type];
 
   // Emojis representing the medium
   const typeIcons = {
@@ -31,15 +39,37 @@ export default function ArtworkCard({ artwork, onClick }) {
       }}
     >
       {/* Media Preview Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-950">
-        <img
-          src={displayImage}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-        />
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-950 flex items-center justify-center">
+        {displayImage ? (
+          <img
+            src={displayImage}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div 
+            className="w-full h-full flex flex-col items-center justify-center gap-3 transition-colors duration-300 group-hover:bg-neutral-900"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--bg-surface) 0%, rgba(255,168,0,0.03) 100%)',
+            }}
+          >
+            {IconComponent ? (
+              <IconComponent 
+                className="w-12 h-12 transition-transform duration-500 group-hover:scale-110" 
+                style={{ color: 'var(--accent-gold)' }}
+                strokeWidth={1.5}
+              />
+            ) : (
+              <span className="text-4xl">✨</span>
+            )}
+            <span className="text-[10px] uppercase font-bold tracking-wider opacity-40 text-center px-4" style={{ color: 'var(--text-muted)' }}>
+              {media_type} preview
+            </span>
+          </div>
+        )}
         {/* Ambient Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-950/20 to-transparent pointer-events-none" />
         
         {/* Media type icon badge */}
         <span className="absolute top-3 left-3 bg-neutral-900/80 backdrop-blur-md text-xs py-1 px-2.5 rounded-full border border-white/5 flex items-center gap-1.5 text-white">
