@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
 export default function CategoryDoor({ slug, name, description, icon, gradient, index }) {
   return (
     <Link
