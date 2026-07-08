@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout.jsx';
 import ScrollToHash from './components/layout/ScrollToHash.jsx';
@@ -10,6 +11,11 @@ import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import AdminGate from './components/admin/AdminGate.jsx';
 
 function App() {
+  useEffect(() => {
+    // Clear session on page load/refresh (redirecting admin back to request page)
+    sessionStorage.removeItem('isAdmin');
+  }, []);
+
   return (
     <Routes>
       {/* Admin dashboard — rendered WITHOUT the main site Layout (no navbar/footer) */}
