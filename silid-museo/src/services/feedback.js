@@ -1,24 +1,30 @@
 import { supabase } from '../lib/supabase.js';
 import { adminFetch } from './adminApi.js';
 
-/* ─── Public: visitors reading/writing their own comments ─── */
+/* ─── Public: visitors submitting/reading their own ratings ─── */
 
 /**
- * Submits feedback tied to a specific artwork
- * (shown in the ArtworkModal, alongside the rating).
+ * Submits a rating for an artwork.
+ * voterToken is a per-browser random id (see useLocalVote hook)
+ * used to softly prevent the same visitor from rating twice —
+ * enforced by the unique index in schema.sql when present.
  */
-export async function submitArtworkFeedback(artworkId, commentText) {
+export async function submitRating(artworkId, score, voterToken = null) {
     const { data, error } = await supabase
-        .from('artwork_feedback')
+        .from('ratings')
         .insert({
             artwork_id: artworkId,
-            comment_text: commentText,
+            score,
+            voter_token: voterToken,
         })
         .select()
         .single();
 
     if (error) {
-        console.error('Failed to submit artwork feedback:', error.message);
+        // A unique constraint violation here means this browser
+        // already rated this artwork — handle that case gracefully
+        // in the UI rather than showing a raw error.
+        console.error('Failed to submit rating:', error.message);
         throw error;
     }
 
@@ -26,78 +32,39 @@ export async function submitArtworkFeedback(artworkId, commentText) {
 }
 
 /**
- * Fetches all feedback comments for a specific artwork.
+ * Fetches the average rating + count for a single artwork,
+ * using the artwork_ratings_summary view from schema.sql.
  */
-export async function getArtworkFeedback(artworkId) {
+export async function getAverageRating(artworkId) {
     const { data, error } = await supabase
-        .from('artwork_feedback')
-        .select('*')
+        .from('artwork_ratings_summary')
+        .select('average_rating, rating_count')
         .eq('artwork_id', artworkId)
-        .order('created_at', { ascending: false });
+        .maybeSingle(); // returns null instead of erroring if no ratings yet
 
     if (error) {
-        console.error('Failed to fetch artwork feedback:', error.message);
+        console.error('Failed to fetch rating summary:', error.message);
         throw error;
     }
 
-    return data;
+    // No ratings yet — return sensible defaults instead of null
+    return data ?? { average_rating: 0, rating_count: 0 };
 }
 
-/**
- * Submits general feedback on a category page as a whole
- * (not tied to any single artwork).
- */
-export async function submitCategoryFeedback(categoryId, commentText) {
-    const { data, error } = await supabase
-        .from('category_feedback')
-        .insert({
-            category_id: categoryId,
-            comment_text: commentText,
-        })
-        .select()
-        .single();
-
-    if (error) {
-        console.error('Failed to submit category feedback:', error.message);
-        throw error;
-    }
-
-    return data;
-}
+/* ─── Admin: moderation panel (reads stay direct, writes go through the Edge Function) ─── */
 
 /**
- * Fetches all feedback comments for a specific category.
- */
-export async function getCategoryFeedback(categoryId) {
-    const { data, error } = await supabase
-        .from('category_feedback')
-        .select('*')
-        .eq('category_id', categoryId)
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error('Failed to fetch category feedback:', error.message);
-        throw error;
-    }
-
-    return data;
-}
-
-/* ─── Admin: moderation panel (reads + writes via Edge Function) ─── */
-
-/**
- * Fetches ALL artwork feedback across all artworks (for admin moderation).
+ * Fetches ALL ratings across all artworks (for admin moderation).
  * Joins with the artworks table to include the artwork title.
- * Read-only, so it stays on the direct client — no badge needed just to look.
  */
-export async function getAllArtworkFeedback() {
+export async function getAllRatings() {
     const { data, error } = await supabase
-        .from('artwork_feedback')
+        .from('ratings')
         .select('*, artworks(title, category_id)')
         .order('created_at', { ascending: false });
 
     if (error) {
-        console.error('Failed to fetch all artwork feedback:', error.message);
+        console.error('Failed to fetch all ratings:', error.message);
         throw error;
     }
 
@@ -105,85 +72,34 @@ export async function getAllArtworkFeedback() {
 }
 
 /**
- * Fetches ALL category feedback across all categories (for admin moderation).
- * Joins with the categories table to include the category name.
+ * Creates a rating from the admin panel (goes through the Edge Function).
  */
-export async function getAllCategoryFeedback() {
-    const { data, error } = await supabase
-        .from('category_feedback')
-        .select('*, categories(name)')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error('Failed to fetch all category feedback:', error.message);
-        throw error;
-    }
-
-    return data;
-}
-
-/**
- * Creates an artwork comment from the admin panel (goes through the Edge Function).
- */
-export async function createArtworkFeedbackAdmin(artworkId, commentText) {
-    return adminFetch('/artwork-feedback', {
+export function createRatingAdmin(artworkId, score, voterToken = null) {
+    return adminFetch('/ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ artworkId, commentText }),
+        body: JSON.stringify({ artworkId, score, voterToken }),
     });
 }
 
 /**
- * Updates an artwork feedback comment (admin moderation).
+ * Updates a rating entry (admin moderation).
  */
-export async function updateArtworkFeedback(feedbackId, updates) {
-    return adminFetch('/artwork-feedback', {
+export function updateRating(ratingId, updates) {
+    return adminFetch('/ratings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedbackId, updates }),
+        body: JSON.stringify({ ratingId, updates }),
     });
 }
 
 /**
- * Deletes a single artwork feedback comment (admin moderation).
+ * Deletes a single rating entry (admin moderation).
  */
-export async function deleteArtworkFeedback(feedbackId) {
-    return adminFetch('/artwork-feedback', {
+export function deleteRating(ratingId) {
+    return adminFetch('/ratings', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedbackId }),
-    });
-}
-
-/**
- * Creates a category comment from the admin panel (goes through the Edge Function).
- */
-export async function createCategoryFeedbackAdmin(categoryId, commentText) {
-    return adminFetch('/category-feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId, commentText }),
-    });
-}
-
-/**
- * Updates a category feedback comment (admin moderation).
- */
-export async function updateCategoryFeedback(feedbackId, updates) {
-    return adminFetch('/category-feedback', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedbackId, updates }),
-    });
-}
-
-/**
- * Deletes a single category feedback comment (admin moderation).
- */
-export async function deleteCategoryFeedback(feedbackId) {
-    return adminFetch('/category-feedback', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedbackId }),
+        body: JSON.stringify({ ratingId }),
     });
 }
