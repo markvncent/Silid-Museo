@@ -58,6 +58,8 @@ export default function HomePage() {
         // Map categories to FocusRail items format
         const items = finalCategories.map((cat) => ({
           id: cat.id || cat.slug,
+          categoryId: cat.id,
+          categorySlug: cat.slug,
           title: cat.name,
           description: cat.description,
           meta: `${cat.icon} Category`,

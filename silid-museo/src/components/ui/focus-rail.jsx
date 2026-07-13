@@ -5,6 +5,77 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { getArtworksByCategory } from "@/services/artworks.js";
+import { fallbackArtworks } from "@/data/fallbackArtworks.js";
+
+function CategoryThumbnailCycler({ categoryId, categorySlug, defaultImage, alt }) {
+  const [images, setImages] = React.useState([defaultImage]);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    let active = true;
+    const fetchImages = async () => {
+      let artworkList = [];
+      try {
+        if (categoryId) {
+          artworkList = await getArtworksByCategory(categoryId);
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch artworks for category ID ${categoryId}:`, err);
+      } finally {
+        if (!artworkList || artworkList.length === 0) {
+          artworkList = fallbackArtworks[categorySlug] || [];
+        }
+        
+        // Extract display images (thumbnail_url or image media_url)
+        const extractedImages = artworkList
+          .map(art => art.thumbnail_url || (art.media_type === 'image' ? art.media_url : null))
+          .filter(Boolean);
+
+        if (active) {
+          if (extractedImages.length > 0) {
+            setImages(extractedImages);
+          } else {
+            setImages([defaultImage]);
+          }
+        }
+      }
+    };
+
+    fetchImages();
+
+    return () => {
+      active = false;
+    };
+  }, [categoryId, categorySlug, defaultImage]);
+
+  React.useEffect(() => {
+    if (images.length <= 1) return;
+
+    const intervalId = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 4000); // cycle every 4 seconds
+
+    return () => clearInterval(intervalId);
+  }, [images]);
+
+  return (
+    <div className="relative w-full h-full rounded-2xl overflow-hidden bg-neutral-950 flex items-center justify-center">
+      <AnimatePresence mode="popLayout">
+        <motion.img
+          key={images[currentIndex]}
+          src={images[currentIndex]}
+          alt={alt}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.0, ease: "easeInOut" }}
+          className="absolute inset-0 h-full w-full object-cover pointer-events-none rounded-2xl"
+        />
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function parseCategoryName(fullName) {
   if (!fullName) return { main: "", sub: "" };
@@ -225,10 +296,11 @@ export function FocusRail({
                   if (offset !== 0) setActive((p) => p + offset);
                 }}
               >
-                <img
-                  src={item.imageSrc}
+                <CategoryThumbnailCycler
+                  categoryId={item.categoryId}
+                  categorySlug={item.categorySlug}
+                  defaultImage={item.imageSrc}
                   alt={item.title}
-                  className="h-full w-full rounded-2xl object-cover pointer-events-none"
                 />
 
                 {/* Lighting layers */}
