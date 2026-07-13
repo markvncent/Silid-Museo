@@ -1,5 +1,5 @@
 import { FileText } from 'lucide-react';
-
+import { useState, useEffect } from 'react';
 export default function MediaPlayer({ mediaUrl, mediaType, title, thumbnailUrl }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
