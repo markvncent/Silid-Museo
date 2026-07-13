@@ -8,11 +8,16 @@ import { cn } from "@/lib/utils";
 import { getArtworksByCategory } from "@/services/artworks.js";
 import { fallbackArtworks } from "@/data/fallbackArtworks.js";
 
-function CategoryThumbnailCycler({ categoryId, categorySlug, defaultImage, alt }) {
-  const [images, setImages] = React.useState([defaultImage]);
+function CategoryThumbnailCycler({ categoryId, categorySlug, defaultImage, uploadedCoverUrl, alt }) {
+  const [images, setImages] = React.useState([uploadedCoverUrl || defaultImage]);
   const [currentIndex, setCurrentIndex] = React.useState(0);
 
   React.useEffect(() => {
+    if (uploadedCoverUrl) {
+      setImages([uploadedCoverUrl]);
+      return;
+    }
+
     let active = true;
     const fetchImages = async () => {
       let artworkList = [];
@@ -47,7 +52,7 @@ function CategoryThumbnailCycler({ categoryId, categorySlug, defaultImage, alt }
     return () => {
       active = false;
     };
-  }, [categoryId, categorySlug, defaultImage]);
+  }, [categoryId, categorySlug, defaultImage, uploadedCoverUrl]);
 
   React.useEffect(() => {
     if (images.length <= 1) return;
@@ -300,6 +305,7 @@ export function FocusRail({
                   categoryId={item.categoryId}
                   categorySlug={item.categorySlug}
                   defaultImage={item.imageSrc}
+                  uploadedCoverUrl={item.uploadedCoverUrl}
                   alt={item.title}
                 />
 

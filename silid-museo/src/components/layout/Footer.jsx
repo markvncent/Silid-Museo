@@ -25,19 +25,21 @@ export default function Footer() {
             <span className="h-[1px] flex-1 bg-[var(--border-subtle)] hidden md:block"></span>
           </div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full">
+          {/* Bento Layout */}
+          <div className="flex flex-wrap justify-center gap-3 w-full">
             {[
               { name: 'Achas, Kieth Lawrence', email: 's.achas.kiethlawrence@cmu.edu.ph' },
+              { name: 'Espinosa, Heart Arachelli', email: 's.espinosa.heartarachelli@cmu.edu.ph' },
               { name: 'Galleros, Kimberly', email: 's.galleros.kimberly@cmu.edu.ph' },
               { name: 'Pañares, Frenche Jyne', email: 's.panares.frenchejyne@cmu.edu.ph' },
+              { name: 'Ramir, Ceth Gayle', email: 's.ramir.cethgayle@cmu.edu.ph' },
               { name: 'Revilla, Cherlyn', email: 's.revillia.cherlyn@cmu.edu.ph' },
               { name: 'Saballia, Clarence', email: 's.saballia.clarence@cmu.edu.ph' },
               { name: 'Tan, Rodge Daniellette', email: 's.tan.rodgedaniellette@cmu.edu.ph' },
             ].map((artist, idx) => (
               <div
                 key={idx}
-                className="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border text-center select-none"
+                className="group relative flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 border text-center select-none w-[calc(50%-6px)] sm:w-[calc(33.333%-8px)] lg:w-[calc(16.666%-10px)] min-w-[120px] max-w-[180px]"
                 style={{
                   backgroundColor: 'color-mix(in srgb, var(--bg-surface-hover) 80%, transparent)',
                   borderColor: 'var(--border-subtle)',
@@ -55,7 +57,7 @@ export default function Footer() {
                 }}
               >
                 {/* Artist Name */}
-                <p 
+                <p
                   className="font-sans font-medium text-xs sm:text-[13px] leading-tight transition-all duration-300 py-1.5"
                   style={{ color: 'var(--text-primary)' }}
                 >
@@ -63,7 +65,7 @@ export default function Footer() {
                 </p>
 
                 {/* Popover Email Block */}
-                <div 
+                <div
                   className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2.5 px-3 py-1.5 rounded-lg border opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-xl z-50 text-[10px] font-sans tracking-wide whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--bg-surface)',
@@ -74,7 +76,7 @@ export default function Footer() {
                 >
                   {artist.email}
                   {/* Tooltip arrow */}
-                  <div 
+                  <div
                     className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 border-r border-b"
                     style={{
                       backgroundColor: 'var(--bg-surface)',

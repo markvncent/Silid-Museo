@@ -25,7 +25,7 @@ export default function CategoryPage() {
   const category = categories.find((c) => c.slug === slug);
 
   const [artworks, setArtworks] = useState([]);
-  const [selectedSubcategory, setSelectedSubcategory] = useState('Drawing');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('Painting');
   const [loading, setLoading] = useState(true);
   const [activeArtwork, setActiveArtwork] = useState(null);
   const [dbCategory, setDbCategory] = useState(null);
@@ -40,7 +40,7 @@ export default function CategoryPage() {
 
     // Reset page states
     setArtworks([]);
-    setSelectedSubcategory('Drawing');
+    setSelectedSubcategory('Painting');
     setFeedbackList([]);
     setNewFeedback('');
     setActiveArtwork(null);
@@ -243,7 +243,7 @@ export default function CategoryPage() {
           {category?.slug === 'silid-lona' && (
             <div className="flex justify-center md:justify-start mb-8 font-serif" style={{ fontFamily: 'EB Garamond, Georgia, serif' }}>
               <div className="inline-flex rounded-full p-1 border" style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-brown)' }}>
-                {['Drawing', 'Painting'].map((subcat) => {
+                {['Painting', 'Drawing'].map((subcat) => {
                   const isActive = selectedSubcategory === subcat;
                   return (
                     <button

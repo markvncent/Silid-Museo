@@ -49,6 +49,7 @@ export default function HomePage() {
               icon: localConfig.icon || '🎨',
               gradient: localConfig.gradient || 'from-neutral-800 to-neutral-900',
               cover_image_url: dbCat.cover_image_url || localConfig.cover_image_url,
+              dbCoverImageUrl: dbCat.cover_image_url || null,
             };
           });
         }
@@ -63,6 +64,7 @@ export default function HomePage() {
           title: cat.name,
           description: cat.description,
           meta: `${cat.icon} Category`,
+          uploadedCoverUrl: cat.dbCoverImageUrl || null,
           imageSrc: cat.cover_image_url || CATEGORY_IMAGES[cat.slug] || CATEGORY_IMAGES['silid-lona'],
           href: `/category/${cat.slug}`,
         }));

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { updateCategory } from '../../services/categories.js';
+import { uploadMedia } from '../../services/storage.js';
 
 /**
  * Inline edit form for a single category's details (FR-5.6).
@@ -10,9 +11,12 @@ export default function CategoryForm({ category, onSaved, onCancel }) {
   const [description, setDescription] = useState(category?.description || '');
   const [expandedDescription, setExpandedDescription] = useState(category?.expanded_description || '');
   const [coverImageUrl, setCoverImageUrl] = useState(category?.cover_image_url || '');
+  const [file, setFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,12 +27,27 @@ export default function CategoryForm({ category, onSaved, onCancel }) {
     setSuccess(false);
 
     try {
+      let finalCoverImageUrl = coverImageUrl;
+      
+      // Upload file if new one is selected
+      if (file) {
+        const result = await uploadMedia(file, category.id);
+        finalCoverImageUrl = result.publicUrl;
+      }
+
       await updateCategory(category.id, {
         name: name.trim(),
         description: description.trim(),
         expanded_description: expandedDescription.trim(),
-        cover_image_url: coverImageUrl.trim() || null,
+        cover_image_url: finalCoverImageUrl ? finalCoverImageUrl.trim() : null,
       });
+
+      // Reset file selection since it is now uploaded
+      setFile(null);
+      if (finalCoverImageUrl) {
+        setCoverImageUrl(finalCoverImageUrl);
+      }
+
       setSuccess(true);
       onSaved?.();
       setTimeout(() => setSuccess(false), 3000);
@@ -103,24 +122,97 @@ export default function CategoryForm({ category, onSaved, onCancel }) {
         />
       </div>
 
-      {/* Cover Image URL */}
+      {/* Cover Image Upload */}
       <div>
-        <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>
-          Cover Image URL
+        <label className="block text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>
+          Cover Image (Carousel Cover)
         </label>
-        <input
-          type="url"
-          value={coverImageUrl}
-          onChange={(e) => setCoverImageUrl(e.target.value)}
-          placeholder="https://..."
-          className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition-all duration-200 focus:ring-1 focus:ring-amber-500/30"
-          style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
-        />
-        {coverImageUrl && (
-          <div className="mt-2 rounded-lg overflow-hidden border h-24 w-40" style={{ borderColor: 'var(--border-subtle)' }}>
-            <img src={coverImageUrl} alt="Cover preview" className="h-full w-full object-cover" />
-          </div>
-        )}
+        <div
+          onDragEnter={(e) => { e.preventDefault(); setDragActive(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
+          onDragOver={(e) => { e.preventDefault(); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+            if (e.dataTransfer.files?.[0]) {
+              const dropped = e.dataTransfer.files[0];
+              if (dropped.type.startsWith('image/')) {
+                setFile(dropped);
+              } else {
+                setError('Cover image must be an image file.');
+              }
+            }
+          }}
+          onClick={() => fileInputRef.current?.click()}
+          className={`relative cursor-pointer rounded-xl border-2 border-dashed p-4 text-center transition-all duration-300 ${
+            dragActive
+              ? 'border-amber-500/50 bg-amber-500/5'
+              : 'border-white/10 hover:border-white/20 bg-neutral-900/30'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={(e) => {
+              const selected = e.target.files?.[0];
+              if (selected) {
+                if (selected.type.startsWith('image/')) {
+                  setFile(selected);
+                } else {
+                  setError('Cover image must be an image file.');
+                }
+              }
+            }}
+            className="hidden"
+            accept="image/*"
+          />
+          {file ? (
+            <div className="space-y-1">
+              <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
+                {file.name} (Ready to upload)
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFile(null);
+                }}
+                className="text-[10px] text-red-400 hover:text-red-300 font-semibold underline"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : coverImageUrl ? (
+            <div className="space-y-2">
+              <img
+                src={coverImageUrl}
+                alt="Current Cover"
+                className="mx-auto h-16 w-auto rounded border border-white/10 object-cover"
+              />
+              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                Drag & drop a new image here, or <span className="text-amber-500 font-medium">browse</span> to replace
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCoverImageUrl('');
+                  setFile(null);
+                }}
+                className="text-[10px] text-red-400 hover:text-red-300 font-semibold underline"
+              >
+                Remove Cover Image
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-1.5 py-1">
+              <div className="text-xs font-medium opacity-30" style={{ color: 'var(--text-muted)' }}>Upload Cover Image</div>
+              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                Drag & drop an image here, or <span className="text-amber-500 font-medium">browse</span>
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Error / Success */}

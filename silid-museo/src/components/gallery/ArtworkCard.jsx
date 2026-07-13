@@ -71,12 +71,6 @@ export default function ArtworkCard({ artwork, onClick }) {
         {/* Ambient Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-neutral-950/20 to-transparent pointer-events-none" />
         
-        {/* Media type icon badge */}
-        <span className="absolute top-3 left-3 bg-neutral-900/80 backdrop-blur-md text-xs py-1 px-2.5 rounded-full border border-white/5 flex items-center gap-1.5 text-white">
-          <span>{typeIcons[media_type] || '✨'}</span>
-          <span className="capitalize text-[10px] tracking-wide font-medium">{media_type}</span>
-        </span>
-
         {/* Fallback Preview Tag */}
         {is_fallback && (
           <span className="absolute top-3 right-3 bg-amber-500/20 backdrop-blur-md text-[10px] font-bold text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
